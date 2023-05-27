@@ -131,9 +131,9 @@ Estando tudo correto, pode-se fazer o merge. E, a partir do merge, é gerada uma
 
 ### Definição de um nova Organização no GitHub
 
-Antes de realizarmos o nosso primeiro commit no GitHub, é necessário atentar que, para trabalhar no GitHub de forma colaborativa, ou seja, aonde haja a participação de outros colaboradores nos repositórios, é necessário criar uma organização onde os colaboradores possam ser vinculados.
+Antes de realizarmos o nosso primeiro _commit_ no _GitHub_, é necessário atentar que, para trabalhar no _GitHub_ de forma colaborativa, ou seja, aonde haja a participação de outros colaboradores nos repositórios, é necessário criar uma organização onde os colaboradores possam ser vinculados.
 
-Nesse sentido, criamos uma organização fictícia, a _maratonafullcyclesidartaoss_ e vinulamos 3 usuários do GitHub a essa organização, conforme a definição abaixo:
+Nesse sentido, criamos uma organização fictícia, a _maratonafullcyclesidartaoss_ e vinculamos 3 usuários do GitHub a essa organização, conforme a definição abaixo:
 
 ![Nova organização e usuários do GitHub vinculados](./images/nova-organizacao-e-usuarios-vinculados.png)
 
@@ -143,7 +143,7 @@ Logo, para o commit da aplicação driver:
 
 ![Criação do repositório Driver](./images/criacao-repositorio-driver.png)
 
-2. Para dar o push inicial da aplicação no GitHub:
+2. E para dar o _push_ inicial da aplicação no _GitHub_:
 
 ```
 git init
@@ -157,19 +157,7 @@ git remote add origin https://github.com/maratonafullcyclesidartaoss/fullcycle-m
 git push -u origin master
 ```
 
-### Configuração de branches no GitHub
-
-São consideradas boas práticas e que dão maior segurança e tranqüilidade à equipe no momento de trabalhar com um repositório do GitHub:
-
-- Não comitar diretamente no master;
-- Não comitar diretamente no develop;
-- Sempre trabalhar com Pull Requests.
-
-### PRs e Code Review
-
 ### Continuous Integration
-
-#### GitHub Actions
 
 Esses são alguns dos principais subprocessos envolvidos na execução do processo de CI e que são cobertos neste projeto:
 
@@ -188,61 +176,110 @@ Algumas das ferramentas populares para a geração do processo de Integração C
 - _Google Cloud Build_;
 - _GitLab CI/CD_.
 
-A ferramenta que optou-se utilizar é o _GitHub_ _Actions_. Principalmente porque:
+#### GitHub Actions
+
+A ferramenta escolhida para este projeto é o _GitHub_ _Actions_. Principalmente porque:
 
 - É livre de cobrança para repositórios públicos;
-- É totalmente integrada ao GitHub.
+- É totalmente integrada ao _GitHub_.
 
-Estar integrado ao GitHub torna-se um diferencial, porque, baseado em eventos que acontecem no repositório, vários tipos de ações além de CI podem ser executadas.
+Estar integrado ao _GitHub_ pode ser considerado um diferencial, porque, baseado em eventos que acontecem no repositório, vários tipos de Ações (_Actions_), além das relacionadas ao processo de _CI_, podem ser executadas.
 
-Essas ações, geralmente, são desenvolvidas por outros desenvolvedores.
+Sempre se inicia uma _GitHub Action_ a partir de um _workflow_.
 
-Ao trabalhar com _GitHub_ _Actions_, sempre se inicia por um _workflow_.
+#### Workflow
 
 O _workflow_ consiste em um conjunto de processos definidos pelo desenvolvedor, sendo que é possível ter mais de um _workflow_ por repositório.
 
-O _workflow_:
+Um _workflow_:
 
 - É definido em arquivos _.yaml_ no diretório _.github/workflows_;
 - Possui um ou mais _jobs_ (que o _workflow_ roda);
 - É iniciado a partir de eventos do _GitHub_ ou através de agendamento.
 
-Para cada evento, é possível definir:
+#### Eventos
 
-- Filtros;
-- Ambiente;
-- Ações.
+Para cada evento, é possível definir filtros, ambiente e ações.
 
 Exemplo:
 
-- Evento:
-  on: push
-
+- **Evento**:
+  - _on: push_
 - Filtros:
-  branches:
-  master
-
+  - _branches_:
+    _master_
 - Ambiente:
-  runs-on: ubuntu
-
+  - _runs-on: ubuntu_
 - Ações:
-  steps:
-  - uses: action/run-composer
-  - run: npm run prod
+  - _steps_:
+    - _uses: action/run-composer_
+    - _run: npm run prod_
 
-Nesse exemplo, é disparado um evento de _on_ _push_, ou seja, alguém executou um _push_ no repositório.
+Nesse exemplo:
 
-O ambiente define a máquina em que o processo de _CI_ deve rodar, ou seja, em uma máquina _ubuntu_.
+- É disparado um _evento_ de _on_ _push_, onde alguém executou um _push_ no repositório;
+- O _ambiente_ define a máquina em que o processo de _CI_ deve rodar; nesse caso, em uma máquina _ubuntu_;
+- O _filtro_ define que o evento deve acontecer somente quando for executado um _push_ para o _branch master_;
+- As _ações_ definem passos (_steps_), subdivididos em duas opções:
+  - _uses_ define uma _Action_ do _GitHub_, ou seja, um código desenvolvido por um desenvolvedor para ser executado no padrão do _GitHub Actions_. Inclusive, há um _marketplace_ do _GitHub Actions_ (`https://github.com/marketplace`);
+  - _run_ permite executar uma _Action_ ou um comando; nesse caso, é executado um comando dentro da máquina _ubuntu_.
 
-O filtro define que o evento deve acontecer somente quando for executado um _push_ para o _branch master_.
+### Configuração de branches no GitHub
 
-As ações definem alguns passos (_steps_), divididos em duas opções: _uses_ e _run_:
+São consideradas boas práticas que dão mais segurança e tranqüilidade aos membros da equipe ao trabalhar com repositórios no GitHub:
 
-- O _uses_ define uma _Action_ do _GitHub_, ou seja, um código desenvolvido por algum desenvolvedor para ser executado no padrão do _GitHub Actions_. Inclusive, há o _marketplace_ do _GitHub Actions_ (`https://github.com/marketplace`) com todas as _Actions_ disponíveis para uso.
+- Nunca comitar diretamente no _branch master_;
+- Nunca comitar diretamente no _branch develop_;
+- Sempre trabalhar com _Pull Requests_.
 
-- O _run_ permite executar uma _Action_ ou um comando. Neste caso, é executado um comando dentro da máquina _ubuntu_.
+Sendo assim, a seguir, são feitas algumas configurações básicas para a proteção dos _branches_.
+
+### Protegendo branches
+
+A princípio, o repositório é criado apenas com o _branch master_. Então, deve-se criar o _branch develop_ também:
+
+```
+git checkout -b develop
+
+git push origin develop
+```
+
+![Criação branch develop](./images/criacao-branch-develop.png)
+
+Dessa forma, o _branch master_ não será mais o _branch_ padrão. Ele será um _branch_ que utilizaremos como base para verificar se o que está nele equivale ao que está em Produção.
+
+E o _branch_ padrão que utizaremos para comitar, conforme o processo de _Git Flow_, será o _develop_.
+
+Neste momento, então, nós vamos nas configurações do _GitHub_, em _Settings_ / _Default branch_ e alteramos de _master_ para _develop_, para garantir que os _commits_ não serão feitos diretamente para o _branch master_.
+
+Outra configuração importante refere-se à parte de proteção. Para isso, ao acessar _Settings / Branches / Branch protection rules_, é possível adicionar regras de proteção para os _branches_.
+
+Primeiramente, faremos a proteção do _branch master_. Neste momento, nós iremos restringir o _push_ para alguns grupos ou pessoas, ao marcar a opção _Restrict who can push to matching branches_. Por ora, é isso. Clicamos em Create.
+
+Em seguida, fazemos a proteção do _branch develop_, da mesma forma que fizemos com o _branch master_.
+
+Agora que os branches estão minimamente protegidos, vamos iniciar com o processo de _Pull Requests_.
+
+### Pull Requests
+
+Primeiramente, nós criamos um novo branch para uma nova funcionalidade:
+
+```
+git checkout -b feature/update-readme
+```
+
+Vamos alterar o arquivo _README.md_ e adicionar um arquivo no diretório _images_. Então, damos um _commit_ e um _push_ para subir no _GitHub_:
+
+```
+git add .
+
+git commit -m "docs: update readme.md"
+
+git push origin feature/update-readme
+```
 
 #### Referência
 
 FULL CYCLE 3.0. Integração contínua. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 26 mai. 2023.
+
 FULL CYCLE 3.0. Padrões e técnicas avançadas com Git e Github. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 26 mai. 2023.

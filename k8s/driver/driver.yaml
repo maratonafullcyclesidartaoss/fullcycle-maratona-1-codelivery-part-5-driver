@@ -16,3 +16,4 @@ spec:
           image: img-deployment
           ports:
             - containerPort: 8081
+

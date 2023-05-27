@@ -278,6 +278,67 @@ git commit -m "docs: update readme.md"
 git push origin feature/update-readme
 ```
 
+O repositório no GitHub verifica que um novo branch chamado feature/update-readme subiu e já oferece a opção de comparar esse branch com os demais branches do repositório e já realizar uma _Pull Request_.
+
+![Compare & pull request](./images/compare-and-pull-request.png)
+
+Ao clicar em _Compare & pull request_, o GitHub mostra a opção de solicitar uma _Pull Request_ (_PR_) para o branch _develop_. Todas às vezes em que é criado um _PR_, é necessário detalhar sobre o que se trata o _PR_ na parte de comentários. Então, após deixar um comentário, clica-se em _Create pull request_.
+
+A partir deste momento, caso não haja nenhum conflito impedindo, é possível realizar o _merge_ para _develop_. Então, é só clicar em _Merge pull request_ e _Confirm merge_.
+
+O _GitHub_ aproveita para sugerir que deletemos o branch _feature/update-readme_, uma vez que já foi mergeado. Após deletar o _branch_ no _GitHub_, é necessário, também, deletar na máquina local:
+
+```
+git checkout develop
+
+git pull origin develop
+
+git branch
+
+git branch -d feature/update-readme
+
+git branch
+```
+
+### Criando Template para PRs
+
+Toda vez em que é criado um _PR_, é possível adicionar um detalhamento na parte de comentários para esse _PR_.
+
+No entanto, esse detalhamento pode deixar muito a desejar, porque pode ficar em um escopo muito aberto.
+
+Por conta disso, é possível trabalhar com a utilização de _templates_ para _PRs_. Então, toda vez que for criado um novo _PR_, um _template_ pré-montado é apresentado à pessoa que esteja criando o _PR_ para que ela possa seguir algumas diretrizes.
+
+Nesse sentido, vamos utilizar um _template_ baseado em um modelo disponível no _site_ _Embedded Artistry_: `https://embeddedartistry.com/blog/2017/08/04/a-github-pull-request-template-for-your-projects`.
+
+A partir desse modelo, nós vamos criar um arquivo chamado _PULL_REQUEST_TEMPLATE.md_ dentro do diretório _.github_.
+
+O _checklist_ de opções vai depender de cada projeto e das necessidades de cada equipe, mas, o mais importante é ter o modelo de _template_; a partir dele, é possível adaptar o _checklist_ às demandas de cada time.
+
+Então, criamos o _template_ a partir de uma nova funcionalidade:
+
+```
+git checkout -b feature/pull-request-template
+
+```
+
+Criamos um diretório chamado _.github_ e, dentro desse diretório, o arquivo _PULL_REQUEST_TEMPLATE_.md\_.
+
+```
+mkdir .github
+
+touch .github/PULL_REQUEST_TEMPLATE.md
+```
+
+Colamos nesse arquivo o conteúdo do _site_ _Embedded Artistry_. Em seguida, comitamos e subimos para o _GitHub_.
+
+```
+git add .
+
+git commit -m "chore: add pull request template"
+
+git push origin feature/pull-request-template
+```
+
 #### Referência
 
 FULL CYCLE 3.0. Integração contínua. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 26 mai. 2023.

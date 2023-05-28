@@ -433,6 +433,61 @@ Ao clicar em _Save changes_ e voltar na _PR_, percebemos que, tanto o usuário _
 
 ![Bloqueado para o merge](./images/bloqueado-para-o-merge.png)
 
+Assim, quando é feito, pelo menos, uma revisão por um usuário revisor, é liberado o _merge_ para o _branch develop_. Isso garante, então, que um _PR_ só será mergeado após uma ou mais revisões.
+
+### Trabalhando com CODEOWNERS
+
+Imaginemos o seguinte exemplo:
+
+- O usuário _desafiofullcyclesidartaoss_ é um especialista _frontend_ e o usuário _sidartaoss_ é um especialista _backend_. Em determinado momento, por algum motivo, o usuário _desafiofullcyclesidartaoss_ precisou alterar o código que foi criado pelo usuário _sidartaoss_. Não seria apropriado o usuário _sidartaoss_ revisar o _PR_ desse código, já que ele é especialista nesse tipo de código e foi ele quem o criou?
+
+É por conta disso que existe um recurso extremamente útil e que facilita o processo de _code review_ chamado de _CODEOWNERS_, onde é possível definir quem é o dono de certos tipos de códigos. Essa definição pode-se dar a partir de um diretório, uma extensão de arquivos ou até mesmo de um arquivo em específico.
+
+Então, a partir do momento que se atribui a propriedade de um tipo de código para alguém, aquela pessoa será responsável, automaticamente, por revisar aquele tipo de código.
+
+Assim, nós vamos criar um novo _branch_ para criar essa nova funcionalidade:
+
+```
+git checkout -b feature/codeowners
+
+touch .github/CODEOWNERS
+```
+
+Dentro desse arquivo de _CODEOWNERS_, nós vamos inserir o seguinte:
+
+```
+*.js @desafiofullcyclesidartaoss
+.github/ @imersaofullcyclesidartaoss
+*.go @sidartaoss
+*.html @desafiofullcyclesidartaoss
+```
+
+Dessa forma, o usuário _desafiofullcyclesidartaoss_ será o proprietário de todos os arquivos com extensão _\*.js_ e _\*.html_. O usuário _imersaofullcyclesidartaoss_ será o proprietário do diretório _.github/_ e o usuário _sidartaoss_ será o proprietário de todos os arquivos com extensão _\*.go_.
+
+Após subir essa nova funcionalidade para o _GitHub_, nós vamos setar mais uma configuração. Para isso, nós vamos em _Settings / Branches_, selecionar o _branch develop_ para edição e marcar a opção _Require review from Code Owners_. Isso vai habilitar a exigência de que um _code owner_ deve revisar o código.
+
+Para testar esse recurso, nós vamos criar um novo _branch_ para uma nova funcionalidade:
+
+```
+git checkout -b feature/refactor-folders
+
+mv .github/ driver/
+
+mv k8s/ driver/
+
+git status
+
+git add .
+
+git commit -m "refactor: move .github and k8s into driver folder"
+
+git push origin feature/refactor-folders
+```
+
+Note-se que, ao criar o _PR_, automaticamente, aparece o usuário _imersaofullcyclesidartaoss_ como _code owner_ para fazer a revisão do código, porque estamos mexendo no diretório _.github_, ao qual ele é o proprietário:
+
+![Usuário imersaofullcyclesidartaoss adicionado como code owner](./images/imersaofullcyclesidartaoss-adicionado-como-codeowner.png)
+
 #### Referências
 
 FULL CYCLE 3.0. Integração contínua. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 26 mai. 2023.

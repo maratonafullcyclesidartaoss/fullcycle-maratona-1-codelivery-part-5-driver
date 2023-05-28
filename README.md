@@ -258,7 +258,7 @@ Primeiramente, faremos a proteção do _branch master_. Neste momento, nós irem
 
 Em seguida, fazemos a proteção do _branch develop_, da mesma forma que fizemos com o _branch master_.
 
-Agora que os branches estão minimamente protegidos, vamos iniciar com o processo de _Pull Requests_.
+Após configurar uma proteção mínima para os _branches_, vamos adicionar os colaboradores do repositório. Para isso, vamos em _Settings / Collaborators and teams / Manage access_ e clicamos em _Add people_. Adicionamos os usuários _sidartaoss_ e _imersaofullcyclesidartaoss_ no papel de _Admin_ e _desafiofullcyclesidartaoss_ no papel de _Maintain_.
 
 ### Pull Requests
 
@@ -339,7 +339,101 @@ git commit -m "chore: add pull request template"
 git push origin feature/pull-request-template
 ```
 
-#### Referência
+De volta ao _GitHub_, o template não vai funcionar ainda, porque é necessário subir primeiramente para _develop_ através do _PR_ que está sendo criado neste momento. Mas, para os próximos _PRs_, o _template_ já estará sendo aplicado.
+
+Apenas para testar se tudo está funcionando, vamos criar uma nova funcionalidade para, por exemplo, criar um arquivo de manifesto no diretório _k8s/driver_:
+
+```
+git checkout -b feature/k8s-driver
+
+mkdir k8s
+
+mkdir k8s/driver
+
+touch k8s/driver/driver.yaml
+```
+
+Em seguida, comitamos e subimos para o _GitHub_:
+
+```
+git add .
+
+git commit -m "chore: add k8s manifesto to driver"
+
+git push origin feature/k8s-driver
+```
+
+Conforme esperado, ao acessar o repositório no _GitHub_, está sendo exibido o _template_ ao criar um novo _PR_.
+
+![Template para pull request](./images/template-para-pull-request.png)
+
+### Code Review
+
+É extremamente importante ter, quando se está trabalhando em equipe, um ou mais colegas revisando o seu código. Por quê? Porque, quando se está trabalhando em equipe, todos são responsáveis pela entrega do projeto. Então, quando algúem envia um código para revisão, a pessoa que está revisando também é responsável por aquele código.
+
+Para ver o processo de _code review_ no _GitHub_, nós vamos trabalhar com o usuário _desafiofullcyclesidartaoss_ criando um novo _PR_. Esse _PR_ deve ser revisado, posteriormente, pelo usuário _sidartaoss_.
+
+Primeiramente, o usuário _sidartaoss_ criará um _branch_ para uma nova funcionalidade e subirá para o _GitHub_:
+
+```
+git checkoub -b feature/k8s-driver-deployment
+
+git push origin feature/k8s-driver-deployment
+```
+
+Então, no _GitHub_, o usuário _desafiofullcyclesidartaoss_ vai acessar o _branch_ _feature/k8s-driver-deployment_.
+
+![Usuário desafiofullcyclesidartaoss acessa o novo branch](./images/usuario-desafiofullcyclesidartaoss-acessa.png)
+
+Na seqüência, o usuário _desafiofullcyclesidartaoss_ edita o arquivo _k8s/driver/driver.yaml_ com suas alterações e comita.
+
+![Usuário desafiofullcyclesidartaoss altera e comita](./images/usuario-desafiofullcyclesidartaoss-altera-e-comita.png)
+
+Antes de criar o _PR_, o usuário _desafiofullcyclesidartaoss_ vai poder selecionar um revisor para realizar o _code review_ do seu código. Neste caso, será selecionado o usuário _sidartaoss_ como revisor (_Reviewer_).
+
+![Usuário sidartaoss selecionado para revisão](./images/usuario-sidartaoss-selecionado-para-revisao.png)
+
+Após criar o _PR_, o usuário _sidartaoss_ vai perceber, então, que, na aba _Pull requests_, há um _PR_ aguardando revisão. Ao acessá-la, surge, na tela, uma mensagem para adicionar uma nova revisão.
+
+![Adicionar nova revisão](./images/adicionar-nova-revisao.png)
+
+Ao clicar em _Add your review_, caso seja necessário solicitar alguma alteração no código, o revisor (usuário _sidartaoss_) vai adicionar um comentário, clicar em _Start a review_ / _Review chages_, escolher a opção _Request changes_ e clicar em _Submit review_.
+
+Então, o usuário _desafiofullcyclesidartaoss_ acessa a aba _Files changed_, clica em _Edit file_ e efetua a correção solicitada. Ao finalizar, comita as mudanças no mesmo _branch_ em que foi criado o _PR_. Assim, o _branch_ e o _PR_ são atualizados automaticamente.
+
+Depois disso, o usuário _desafiofullcyclesidartaoss_ acessa o _PR_ novamente e, abaixo, na seção _Changes requested_, navega até _requested changes_ e escolhe a opção _Re-request review_.
+
+A partir desse momento, ao acessar o _PR_, o revisor adiciona uma revisão novamente e verifica a(s) mudança(s). Então, se estiver tudo conforme o esperado, ele vai clicar no botão _Review changes_, escolher a opção _Approve_ e clicar em _Submit review_, habilitando, assim, o _merge_, a confirmação do _merge_ e a deleção do _branch_ _feature/k8s-driver-deployment_.
+
+Mas, caso não haja necessidade de solicitar mudanças, o revisor simplesmente clica em _Review changes_, escolhe a opção _Approve_ e clica novamente em _Submit review_, habilitando, então, o _merge_, a confirmação do _merge_ e a deleção do _branch_ _feature/k8s-driver-deployment_.
+
+### Protegendo branch para Code Review
+
+É possível melhorar a proteção dos _branches_ para se trabalhar com _PRs_.
+
+Vejamos um exemplo. O usuário _sidartaoss_ cria o _branch_ de uma nova funcionalidade e sobe para o _GitHub_:
+
+```
+git checkout -b feature/k8s-service
+
+git push origin feature/k8s-service
+```
+
+Então, o usuário _desafiofullcyclesidartaoss_ acessa o _branch_ recém criado, adiciona uma alteração no arquivo _k8s/driver/driver.yaml_, comita a alteração, escolhe um revisor e, finalmente, cria um novo _PR_.
+
+E, mesmo tendo solicitado a revisão, pode-se verificar que o botão _Merge pull request_ permanece habilitado para efetuar o _merge_.
+
+![Botão Merge pull request ainda habilitado](./images/botao-merge-pull-request-ainda-habilitado.png)
+
+Então, como proteger o _branch_ _develop_ para que isso não aconteça?
+
+Acessando _Settings / Branches / Branch protection rules_ e selecionando o _branch_ _develop_, é possível obrigar para que haja _code review_ para toda _PR_ antes de ser possível efetuar o _merge_. Para isso, deve-se selecionar a opção _Require a pull request before merging_. A partir dessa opção, é possível escolher também quantas pessoas devem revisar o código; neste caso, apenas uma.
+
+Ao clicar em _Save changes_ e voltar na _PR_, percebemos que, tanto o usuário _sidartaoss_ quanto o usuário _desafiofullcyclesidartaoss_ ficam bloqueados para efetuar o _merge_ enquanto não for realizado o _code review_:
+
+![Bloqueado para o merge](./images/bloqueado-para-o-merge.png)
+
+#### Referências
 
 FULL CYCLE 3.0. Integração contínua. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 26 mai. 2023.
 

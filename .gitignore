@@ -91,17 +91,4 @@ lerna-debug.log
 .DS_Store
 Thumbs.db
 
-simulator/.env
-
-micro-order/.env
-micro-order/node_modules/
-micro-order/.docker/dbdata/
-
-micro-mapping/backend/.env
-micro-mapping/backend/node_modules/
-micro-mapping/backend/.docker/dbdata/
-
-micro-mapping/frontend/.env
-micro-mapping/frontend/node_modules/
-
-rabbitmq/rabbitmq_data/
+coverage.out

@@ -672,6 +672,73 @@ jobs:
       - run: go build driver.go
 ```
 
+### Preparando ambiente para o SonarCloud
+
+O nosso objetivo, neste momento, é integrar um serviço gerenciado do _Sonarqube_ - o _SonarCloud_ - ao processo de Integração Contínua.
+
+Basicamente, o que iremos fazer é integrar ao _GitHub Actions_ o _quality gate_ do _SonarCloud_.
+
+Então, inicialmente, vamos criar um novo _branch_ para adicionar uma nova funcionalidade:
+
+```
+git checkout -b feature/sonar-cloud
+```
+
+A primeira alteração que faremos no nosso _workflow_ é para permitir trabalharmos com cobertura de código a partir do _SonarCloud_.
+
+Para isso, vamos alterar o comando de teste do _go_ para inserir o resultado dos testes em um arquivo chamado _coverage.out_:
+
+```
+name: ci-driver
+on:
+  pull_request:
+    branches:
+      - develop
+jobs:
+  check-application:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ">=1.18"
+      - run: go test -coverprofile=coverage.out
+```
+
+Em seguida, vamos adicionar um arquivo de configuração à raiz do projeto: _sonar-project.properties_:
+
+```
+touch sonar-project.properties
+
+vim sonar-project.properties
+
+sonar.projectKey=
+sonar.organization=
+
+sonar.sources=.
+sonar.exclusions=**/*_test.go
+
+sonar.tests=.
+sonar.test.inclusions=**/*_test.go
+sonar.go.coverage.reportPaths=coverage.out
+```
+
+A propriedade _sonar.sources_ define aonde está o código-fonte.
+A propriedade _sonar.exclusions_ define quais arquivos devem ser excluídos da cobertura de código.
+A propriedade _sonar.tests_ define aonde estão os arquivos de testes.
+A propriedade _sonar.test.inclusions_ define quais são os arquivos de testes.
+A propriedade _sonar.go.coverage.reportPaths_ define qual é o arquivo de _coverage_.
+
+E vamos subir essas alterações para o _GitHub_.
+
+```
+git add .
+
+git commit -m "ci: add sonar cloud"
+
+git push origin feature/sonar-cloud
+```
+
 #### Referências
 
 FULL CYCLE 3.0. Integração contínua. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 26 mai. 2023.

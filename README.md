@@ -678,7 +678,7 @@ O nosso objetivo, neste momento, é integrar um serviço gerenciado do _Sonarqub
 
 Basicamente, o que iremos fazer é integrar ao _GitHub Actions_ o _quality gate_ do _SonarCloud_.
 
-Então, inicialmente, vamos criar um novo _branch_ para adicionar uma nova funcionalidade:
+Então, inicialmente, vamos criar um novo _branch_ para adicionar essa nova funcionalidade:
 
 ```
 git checkout -b feature/sonar-cloud
@@ -723,11 +723,11 @@ sonar.test.inclusions=**/*_test.go
 sonar.go.coverage.reportPaths=coverage.out
 ```
 
-A propriedade _sonar.sources_ define aonde está o código-fonte.
-A propriedade _sonar.exclusions_ define quais arquivos devem ser excluídos da cobertura de código.
-A propriedade _sonar.tests_ define aonde estão os arquivos de testes.
-A propriedade _sonar.test.inclusions_ define quais são os arquivos de testes.
-A propriedade _sonar.go.coverage.reportPaths_ define qual é o arquivo de _coverage_.
+- A propriedade _sonar.sources_ define aonde está o código-fonte.
+- A propriedade _sonar.exclusions_ define quais arquivos devem ser excluídos da cobertura de código.
+- A propriedade _sonar.tests_ define aonde estão os arquivos de testes.
+- A propriedade _sonar.test.inclusions_ define quais são os arquivos de testes.
+- A propriedade _sonar.go.coverage.reportPaths_ define qual é o arquivo de _coverage_.
 
 E vamos subir essas alterações para o _GitHub_.
 

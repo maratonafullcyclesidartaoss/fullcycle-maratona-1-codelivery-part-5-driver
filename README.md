@@ -632,6 +632,10 @@ Ao acessar na aba _Actions_, verificamos que o _workflow_ _ci-driver_ rodou com 
 
 ![Workflow ci-driver rodou com sucesso](./images/workflow-ci-driver-rodou-com-sucesso.png)
 
+Na parte inferior do _PR_, é possível ver, também, que todas as verificações passaram (_All checks have passed_):
+
+![Todas as verificações passaram](./images/todas-as-verificacoes-passaram.png)
+
 #### Referências
 
 FULL CYCLE 3.0. Integração contínua. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 26 mai. 2023.

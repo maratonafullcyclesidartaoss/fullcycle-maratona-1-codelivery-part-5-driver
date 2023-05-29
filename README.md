@@ -521,7 +521,7 @@ Na seqüência, nós definimos quais são os _jobs_ que queremos executar. O pri
 name: ci-driver
 on: [push]
 jobs:
-  check-application
+  check-application:
 ```
 
 Depois, definimos aonde queremos rodar essa aplicação. Neste caso, será em uma imagem da última versão do _ubuntu_.
@@ -530,7 +530,7 @@ Depois, definimos aonde queremos rodar essa aplicação. Neste caso, será em um
 name: ci-driver
 on: [push]
 jobs:
-  check-application
+  check-application:
     runs-on: ubuntu-latest
 ```
 
@@ -544,7 +544,7 @@ O que o _actions/checkout@v3_ faz é pegar os arquivos do repositório do _GitHu
 name: ci-driver
 on: [push]
 jobs:
-  check-application
+  check-application:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -556,7 +556,7 @@ Outra _action_ que vamos utilizar é a _actions/setup-go@v4_, responsável por p
 name: ci-driver
 on: [push]
 jobs:
-  check-application
+  check-application:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -569,7 +569,7 @@ Após preparar o ambiente, é possível escolher a versão do _go_ que queremos 
 name: ci-driver
 on: [push]
 jobs:
-  check-application
+  check-application:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -584,7 +584,7 @@ E, por fim, vamos rodar um comando para testar e para fazer o _build_ da aplica�
 name: ci-driver
 on: [push]
 jobs:
-  check-application
+  check-application:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -625,8 +625,12 @@ git add .
 
 git commit -m "ci: add github actions"
 
-git push origin master
+git push origin feature/primeiro-workflow
 ```
+
+Ao acessar na aba _Actions_, verificamos que o _workflow_ _ci-driver_ rodou com sucesso.
+
+![Workflow ci-driver rodou com sucesso](./images/workflow-ci-driver-rodou-com-sucesso.png)
 
 #### Referências
 

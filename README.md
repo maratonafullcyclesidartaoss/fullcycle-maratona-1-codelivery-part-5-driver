@@ -636,6 +636,14 @@ Na parte inferior do _PR_, é possível ver, também, que todas as verificaçõe
 
 ![Todas as verificações passaram](./images/todas-as-verificacoes-passaram.png)
 
+### Ativando status check
+
+Voltando às boas práticas de proteção dos _branches_, vamos adicionar mais uma regra de proteção para o _branch develop_: nós vamos exigir que um _status check_ passe antes de realizar o _merge_: _Require status checks to pass before merging_.
+
+Neste caso, nós vamos informar, como _status check_, o _check-application_. O _check-application_ refere-se ao _job_ que nós configuramos no arquivo _ci.yaml_.
+
+![Status check ckeck-application](./images/status-check-check-application.png)
+
 #### Referências
 
 FULL CYCLE 3.0. Integração contínua. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 26 mai. 2023.

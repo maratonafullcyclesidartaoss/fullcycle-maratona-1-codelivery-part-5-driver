@@ -1,0 +1,12 @@
+name: ci-driver
+on: [push]
+jobs:
+  check-application:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ">=1.18"
+      - run: go test ./...
+      - run: go build driver.go

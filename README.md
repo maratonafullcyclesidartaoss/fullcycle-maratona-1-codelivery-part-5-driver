@@ -36,20 +36,25 @@ Nesta quinta versão, trabalhamos a parte de _Continuous Integration_ e _Continu
 
   - Golang
 
-- CI (Continuous Integration)
+- Continuous Integration (_CI_)
 
   - GitHub Actions
 
-- CD (Continuous Deploy)
+- Continuous Deploy (_CD_)
 
   - Google Cloud Build
 
 - Deploy
+
   - Kubernetes GKE
+
+- Infrastructure as Code (_IaC_)
+
+  - Terraform
 
 ### O que faremos
 
-O objetivo deste projeto é cobrir um processo de desenvolvimento do começo ao fim, desde:
+O objetivo deste projeto é cobrir um processo simples de desenvolvimento do início ao fim, desde:
 
 - A utilização de uma metodologia para se trabalhar com o Git - o GitFlow;
 - A adoção de Conventional Commits como especificação para as mensagens de commits;
@@ -64,12 +69,10 @@ Realizando, por fim:
 
 - O deploy da aplicação em um cluster Kubernetes junto a um cloud provider.
 
-Assim, seguimos uma seqüência de passos:
+Assim, seguiremos uma seqüência de passos:
 
-1. Definição da metodologia de Git Flow;
-
+1. Utilização da metodologia de Git Flow;
 2. Definição de um nova Organização no GitHub;
-
 3. Configuração de branches no GitHub;
 
 - Filtros por branches;
@@ -80,22 +83,17 @@ Assim, seguimos uma seqüência de passos:
 - Templates para PRs;
 
 5. Configuração de Code Review no GitHub;
-
 6. Configuração de CODEOWNERS no GitHub;
-
 7. GitHub Actions;
-
 8. Integração do SonarCloud Scan (Linter) ao GitHub Actions;
-
-9. Definição de um cluster GKE utilizando Terraform;
-
+9. Provisionamento de um cluster GKE utilizando Terraform;
 10. Deploy da aplicação utilizando o Google Cloud Build integrado ao GitHub Actions;
 
-### Definição da metodologia de Git Flow
+### Utilização da metodologia de Git Flow
 
 - Qual é o problema que o Git Flow resolve?
 
-Na verdade, o Git Flow é uma metodologia de trabalho que visa simplificar e organizar o processo que envolve o versionamento de código-fonte. Portanto, ele resolve alguns problemas, como, por exemplo:
+Na verdade, o Git Flow é uma metodologia de trabalho que visa simplificar e organizar o processo que envolve o versionamento de código-fonte. Portanto, ele resolve um conjunto de problemas, como, por exemplo:
 
 - Como definir um branch para uma correção?
 - Como definir um branch para uma funcionalidade nova?
@@ -103,13 +101,13 @@ Na verdade, o Git Flow é uma metodologia de trabalho que visa simplificar e org
 - Como saber se o que está no branch master é o mesmo que está em Produção?
 - Como saber se existe um branch de desenvolvimento?
 
-Vejamos, então, dois cenários simples do dia-a-dia aonde é empregado o Git Flow.
+Vejamos, então, dois cenários deste projeto aonde será empregado o Git Flow.
 
 #### Cenário I
 
-Neste cenário, há a definição de um branch master, também conhecido como o branch da verdade, porque, normalmente, o que está no master equivale ao que está em Produção.
+Neste cenário, há a definição de um _branch master_, também conhecido como _o branch da verdade_, porque, normalmente, o que está no _master_ equivale ao que está em Produção.
 
-O Git Flow recomenda que não se commit diretamente no branch master. O master não deve ser um local onde se consolidam todas as novas funcionalidades.
+O Git Flow recomenda que não se commita diretamente no _branch master_. O _master_ não deve ser um local onde se consolidam todas as novas funcionalidades.
 
 Então, o Git Flow define um branch auxiliar para que, quando todas as funcionalidades novas forem agregadas no branch auxiliar, aí sim elas são jogadas para o branch master. Esse branch auxiliar é chamado de _develop_.
 
@@ -157,73 +155,6 @@ git remote add origin https://github.com/maratonafullcyclesidartaoss/fullcycle-m
 git push -u origin master
 ```
 
-### Continuous Integration
-
-Esses são alguns dos principais subprocessos envolvidos na execução do processo de CI e que são cobertos neste projeto:
-
-- Execução de testes;
-- _Linter_;
-- Verificação de qualidade de código;
-- Verificação de segurança;
-- Geração de artefatos prontos para o processo de _deploy_.
-
-Algumas das ferramentas populares para a geração do processo de Integração Contínua:
-
-- _Jenkins_;
-- _GitHub_ _Actions_;
-- _AWS CodeBuild_;
-- _Azure DevOps_;
-- _Google Cloud Build_;
-- _GitLab CI/CD_.
-
-#### GitHub Actions
-
-A ferramenta escolhida para este projeto é o _GitHub_ _Actions_. Principalmente porque:
-
-- É livre de cobrança para repositórios públicos;
-- É totalmente integrada ao _GitHub_.
-
-Estar integrado ao _GitHub_ pode ser considerado um diferencial, porque, baseado em eventos que acontecem no repositório, vários tipos de Ações (_Actions_), além das relacionadas ao processo de _CI_, podem ser executadas.
-
-Sempre se inicia uma _GitHub Action_ a partir de um _workflow_.
-
-#### Workflow
-
-O _workflow_ consiste em um conjunto de processos definidos pelo desenvolvedor, sendo que é possível ter mais de um _workflow_ por repositório.
-
-Um _workflow_:
-
-- É definido em arquivos _.yaml_ no diretório _.github/workflows_;
-- Possui um ou mais _jobs_ (que o _workflow_ roda);
-- É iniciado a partir de eventos do _GitHub_ ou através de agendamento.
-
-#### Eventos
-
-Para cada evento, é possível definir filtros, ambiente e ações.
-
-Exemplo:
-
-- **Evento**:
-  - _on: push_
-- Filtros:
-  - _branches_:
-    _master_
-- Ambiente:
-  - _runs-on: ubuntu_
-- Ações:
-  - _steps_:
-    - _uses: action/run-composer_
-    - _run: npm run prod_
-
-Nesse exemplo:
-
-- É disparado um _evento_ de _on_ _push_, onde alguém executou um _push_ no repositório;
-- O _ambiente_ define a máquina em que o processo de _CI_ deve rodar; nesse caso, em uma máquina _ubuntu_;
-- O _filtro_ define que o evento deve acontecer somente quando for executado um _push_ para o _branch master_;
-- As _ações_ definem passos (_steps_), subdivididos em duas opções:
-  - _uses_ define uma _Action_ do _GitHub_, ou seja, um código desenvolvido por um desenvolvedor para ser executado no padrão do _GitHub Actions_. Inclusive, há um _marketplace_ do _GitHub Actions_ (`https://github.com/marketplace`);
-  - _run_ permite executar uma _Action_ ou um comando; nesse caso, é executado um comando dentro da máquina _ubuntu_.
-
 ### Configuração de branches no GitHub
 
 São consideradas boas práticas que dão mais segurança e tranqüilidade aos membros da equipe ao trabalhar com repositórios no GitHub:
@@ -262,7 +193,7 @@ Após configurar uma proteção mínima para os _branches_, vamos adicionar os c
 
 ### Pull Requests
 
-Primeiramente, nós criamos um novo branch para uma nova funcionalidade:
+Primeiramente, nós criamos um novo _branch_ para uma nova funcionalidade:
 
 ```
 git checkout -b feature/update-readme
@@ -487,6 +418,223 @@ git push origin feature/refactor-folders
 Note-se que, ao criar o _PR_, automaticamente, aparece o usuário _imersaofullcyclesidartaoss_ como _code owner_ para fazer a revisão do código, porque estamos mexendo no diretório _.github_, ao qual ele é o proprietário:
 
 ![Usuário imersaofullcyclesidartaoss adicionado como code owner](./images/imersaofullcyclesidartaoss-adicionado-como-codeowner.png)
+
+### Continuous Integration
+
+Esses são alguns dos principais subprocessos envolvidos na execução do processo de _CI_ e que são cobertos neste projeto:
+
+- Execução de testes;
+- _Linter_;
+- Verificação de qualidade de código;
+- Verificação de segurança;
+- Geração de artefatos prontos para o processo de _deploy_.
+
+Algumas das ferramentas populares para a geração do processo de Integração Contínua:
+
+- _Jenkins_;
+- _GitHub_ _Actions_;
+- _AWS CodeBuild_;
+- _Azure DevOps_;
+- _Google Cloud Build_;
+- _GitLab CI/CD_.
+
+#### GitHub Actions
+
+A ferramenta escolhida para este projeto é o _GitHub_ _Actions_. Principalmente porque:
+
+- É livre de cobrança (para repositórios públicos);
+- É totalmente integrada ao _GitHub_.
+
+Estar integrado ao _GitHub_ pode ser considerado um diferencial, porque, baseado em eventos que acontecem no repositório, vários tipos de ações (_Actions_) - além das relacionadas ao processo de _CI_ - podem ser executadas.
+
+Sempre se inicia uma _GitHub Action_ a partir de um _workflow_.
+
+#### Workflow
+
+O _workflow_ consiste em um conjunto de processos definidos pelo desenvolvedor, sendo que é possível ter mais de um _workflow_ por repositório.
+
+Um _workflow_:
+
+- É definido em arquivos _.yaml_ no diretório _.github/workflows_;
+- Possui um ou mais _jobs_ (que o _workflow_ roda);
+- É iniciado a partir de _eventos_ do _GitHub_ ou através de agendamento.
+
+#### Eventos
+
+Para cada evento, é possível definir _filtros_, _ambiente_ e _ações_.
+
+Exemplo:
+
+- **Evento**:
+  - _on: push_
+- Filtros:
+  - _branches_:
+    _master_
+- Ambiente:
+  - _runs-on: ubuntu_
+- Ações:
+  - _steps_:
+    - _uses: action/run-composer_
+    - _run: npm run prod_
+
+Nesse exemplo:
+
+- É disparado um _evento_ de _on_ _push_, no momento em que alguém executou um _push_ no repositório;
+- O _ambiente_ define a máquina em que o processo de _CI_ deve rodar; nesse caso, em uma máquina _ubuntu_;
+- O _filtro_ define que o evento deve acontecer somente quando for executado um _push_ para o _branch master_;
+- As _ações_ definem passos (_steps_), subdivididos em duas opções:
+  - _uses_ define uma _Action_ do _GitHub_, ou seja, um código desenvolvido por um desenvolvedor para ser executado no padrão do _GitHub Actions_. Inclusive, há um _marketplace_ do _GitHub Actions_ (`https://github.com/marketplace`);
+  - _run_ permite executar uma _Action_ ou um comando; nesse caso, é executado um comando dentro da máquina _ubuntu_.
+
+### Criando primeiro workflow
+
+Neste momento, vamos criar o nosso primeiro _workflow_ utilizando o _GitHub Actions_.
+
+Primeiramente, vamos criar um novo _branch_ para uma nova funcionalidade e, em seguida, criamos um novo diretório _.github/workflows_ e um arquivo _ci.yaml_.
+
+```
+git checkout -b feature/primeiro-workflow
+
+mkdir .github/workflows
+
+touch .github/workflows/ci.yaml
+```
+
+Dentro desse arquivo _ci.yaml_, faremos a definição do _workflow_.
+
+O _name_ do _workflow_ pode ser qualquer nome. Neste caso, chamamos de _ci-driver_.
+
+```
+name: ci-driver
+```
+
+No evento de _on push_, ou seja, toda vez que alguém fizer um _push_ diretamente para esse repositório, esse processo de _CI_ vai rodar.
+
+```
+name: ci-driver
+on: [push]
+```
+
+Na seqüência, nós definimos quais são os _jobs_ que queremos executar. O primeiro _job_ que vamos trabalhar será o _check-application_:
+
+```
+name: ci-driver
+on: [push]
+jobs:
+  check-application:
+```
+
+Depois, definimos aonde queremos rodar essa aplicação. Neste caso, será em uma imagem da última versão do _ubuntu_.
+
+```
+name: ci-driver
+on: [push]
+jobs:
+  check-application:
+    runs-on: ubuntu-latest
+```
+
+Após isso, definimos quais são os passos que queremos executar no momento em que esse processo começar a ser executado. O primeiro _step_ é o _actions/checkout@v3_.
+
+> Lembrando que _actions_ refere-se ao usuário e _checkout_ refere-se ao repositório do _GitHub_: `https://github.com/actions/checkout`.
+
+O que o _actions/checkout@v3_ faz é pegar os arquivos do repositório do _GitHub_ e baixar na máquina _ubuntu_.
+
+```
+name: ci-driver
+on: [push]
+jobs:
+  check-application:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+```
+
+Outra _action_ que vamos utilizar é a _actions/setup-go@v4_, responsável por preparar o ambiente _go_.
+
+```
+name: ci-driver
+on: [push]
+jobs:
+  check-application:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+```
+
+Após preparar o ambiente, é possível escolher a versão do _go_ que queremos utilizar.
+
+```
+name: ci-driver
+on: [push]
+jobs:
+  check-application:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '>=1.18'
+```
+
+E, por fim, vamos rodar um comando para testar e para fazer o _build_ da aplicação.
+
+```
+name: ci-driver
+on: [push]
+jobs:
+  check-application:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '>=1.18'
+      - run: go test ./...
+      - run: go build driver.go
+```
+
+Porém, antes de comitar as alterações, vamos criar uma classe de testes: _driver_test.go_
+
+```
+touch driver_test.go
+
+vim driver_test.go
+
+package main
+
+import "testing"
+
+func TestLoadDrivers(t *testing.T) {
+	// arrange
+	// act
+	actual := loadDrivers()
+	// assert
+	if actual == nil {
+		t.Error("Expected drivers but got nil")
+	}
+}
+
+```
+
+E, neste momento, vamos subir para o _GitHub_:
+
+```
+git add .
+
+git commit -m "ci: add github actions"
+
+git push origin feature/primeiro-workflow
+```
+
+Ao acessar na aba _Actions_, verificamos que o _workflow_ _ci-driver_ rodou com sucesso.
+
+![Workflow ci-driver rodou com sucesso](./images/workflow-ci-driver-rodou-com-sucesso.png)
+
+Na parte inferior do _PR_, é possível ver, também, que todas as verificações passaram (_All checks have passed_):
+
+![Todas as verificações passaram](./images/todas-as-verificacoes-passaram.png)
 
 #### Referências
 

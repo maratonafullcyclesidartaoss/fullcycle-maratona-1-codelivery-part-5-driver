@@ -784,6 +784,80 @@ sonar.organization=maratonafullcyclesidartaoss
 
 Com isso, podemos subir as alterações para o _GitHub_.
 
+```
+git add .
+
+git commit -m "ci: add sonar cloud properties"
+
+git push orign feature/sonar-cloud
+```
+
+E, ao subir para o _GitHub_, percebemos que o _Quality Gate_ do _SonarCloud_ falhou:
+
+![Quality Gate do SonarCloud falhou](./images/sonar-cloud-quality-gate-failed.png)
+
+Ao clicar no link _Details_ de _SonarCloud Code Analysis_:
+
+![Análise de Código do SonarCloud](./images/sonar-cloud-code-analysis.png)
+
+- A cobertura de código está abaixo do esperado (80%);
+- Há 3 problemas de segurança;
+- E há 1 _code smell_.
+
+Em relação à cobertura de código:
+
+- Clicamos no _link_ de _24.0% Coverage_;
+- Abaixo no menu esquerdo, vamos em _Administration / Quality Gate_ / Organization's settings e selecionamos ou criamos um novo _Quality Gate_. Neste caso, vamos selecionar _Maratona Quality Gate_;
+- Na métrica de _Coverage_, nós vamos setar um novo valor de 15%;
+
+Em relação aos problemas de segurança, eles foram identificados no _Dockerfile_ e no _Dockerfile.prod_:
+
+- Copying recursively might inadvertently add sensitive data to the container. Make sure it is safe here.
+- The golang image runs with root as the default user. Make sure it is safe here.
+
+Em relação ao _code smell_, ele também foi identificado no _Dockerfile.prod_:
+
+- Replace `as` with upper case format `AS`.
+
+Então, alteramos conforme as recomendações do _SonarCloud_:
+
+- Dockerfile
+
+```
+FROM golang:latest
+
+RUN addgroup -S nonroot \
+    && adduser -S nonroot -G nonroot
+
+USER nonroot
+
+WORKDIR /app
+
+CMD [ "tail", "-f", "/dev/null" ]
+```
+
+- Dockerfile.prod
+
+```
+FROM golang:latest
+
+RUN addgroup -S nonroot \
+    && adduser -S nonroot -G nonroot
+
+USER nonroot
+
+WORKDIR /app
+
+COPY driver.go .
+COPY drivers.json .
+COPY go.mod .
+COPY go.sum .
+
+RUN GOOS=linux go build driver.go
+
+CMD ["./driver"]
+```
+
 #### Referências
 
 FULL CYCLE 3.0. Integração contínua. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 26 mai. 2023.

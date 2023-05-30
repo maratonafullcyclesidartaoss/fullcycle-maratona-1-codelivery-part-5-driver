@@ -862,7 +862,9 @@ Ao subir novamente para o _GitHub_, todas as verificações passaram:
 
 ![Todas as verificações passaram - SonarCloud](./images/all-checks-have-passed-sonar-cloud.png)
 
-Agora, não devemos esquecer de ir em _Settings / Branches / Branch protection rules / Edit develop_ e adicionar _SonarCloud Code Analysis_ na opção de _Require status checks to pass before merging_ e marcar a opção de _Do not allow bypassing the above settings_.
+Agora, não devemos esquecer de ir em _Settings / Branches / Branch protection rules / Edit develop_ e adicionar _SonarCloud Code Analysis_ na opção de _Require status checks to pass before merging_ e marcar a opção de _Do not allow bypassing the above settings_:
+
+![Required statuses must pass before merging](./images/required-statuses-must-pass-before-merging.png)
 
 #### Referências
 

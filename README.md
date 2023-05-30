@@ -858,6 +858,10 @@ RUN GOOS=linux go build driver.go
 CMD ["./driver"]
 ```
 
+Ao subir novamente para o _GitHub_, todas as verificações passaram:
+
+![Todas as verificações passaram - SonarCloud](./images/all-checks-have-passed-sonar-cloud.png)
+
 #### Referências
 
 FULL CYCLE 3.0. Integração contínua. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 26 mai. 2023.

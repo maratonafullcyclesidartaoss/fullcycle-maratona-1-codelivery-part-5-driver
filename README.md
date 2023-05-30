@@ -862,9 +862,11 @@ Ao subir novamente para o _GitHub_, todas as verificações passaram:
 
 ![Todas as verificações passaram - SonarCloud](./images/all-checks-have-passed-sonar-cloud.png)
 
-Agora, ao subir uma nova alteração para o _GitHub_, percebemos que o botão de _Merge pull request_ ainda continua habilitado enquanto o _SonarCloud_ realiza o _Scan_.
+Agora, ao subir uma nova alteração para o _GitHub_, percebemos que aparece a opção de _Merge without waiting for requirements to be met (bypass branch protections)_ enquanto o _SonarCloud_ faz o _Scan_.
 
-Para evitar isso, devemos ir em _Settings / Branches / Branch protection rules_, selecionar _develop_ e adicionar _SonarCloud Code Analysis_ na opção de _Require status checks to pass before merging_.
+![Bypass branch protections habilitado](./images/bypass-branch-protections-habilitado.png)
+
+Para evitar isso, devemos ir em _Settings / Branches / Branch protection rules / Edit develop_ e adicionar _SonarCloud Code Analysis_ na opção de _Require status checks to pass before merging_.
 
 #### Referências
 

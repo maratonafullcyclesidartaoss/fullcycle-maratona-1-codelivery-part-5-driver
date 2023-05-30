@@ -739,6 +739,51 @@ git commit -m "ci: add sonar cloud"
 git push origin feature/sonar-cloud
 ```
 
+### SonarCloud
+
+> Lembrando que o _SonarCloud_ é uma ferramenta paga, mas, para repositórios públicos, ele é gratuito.
+
+- Ao acessar `https://sonarcloud.io`, realiza-se o login pela conta do _GitHub_.
+- No menu superior, deve-se ir em _Analize new project_.
+- Em seguida, seleciona-se a organização, que, neste caso, é _maratonafullcyclesidartaoss_ e o repositório que, neste caso, é _
+  fullcycle-maratona-1-codelivery-part-5-driver_. Por fim, clicar em _Set Up_.
+- Em _Choose your Analisys Method_, deve-se selecionar _With GitHub Actions_.
+- Na tela seguinte, _Analyze a project with a GitHub Action_, o _SonarCloud_ informa que será necessário criar um novo _secret_ chamado _SONAR_TOKEN_ no repositório do _GitHub_.
+- Na parte inferior da tela _Analyze a project with a GitHub Action_, o _SonarCloud_ pergunta qual é a linguagem de programação do projeto. Ao selecionar _Other_, ele apresenta um _template_ para executar o _Scan_ do _SonarCloud_, ao qual adicionamos em _ci.yaml_:
+
+```
+name: ci-driver
+on:
+  pull_request:
+    branches:
+      - develop
+jobs:
+  check-application:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ">=1.18"
+      - run: go test -coverprofile=coverage.out
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+```
+
+E o _SonarCloud_ apresenta também as propriedades a serem adicionadas no arquivo _sonar-project.properties_:
+
+```
+sonar.projectKey=maratonafullcyclesidartaoss_fullcycle-maratona-1-codelivery-part-5-driver
+sonar.organization=maratonafullcyclesidartaoss
+```
+
+Com isso, podemos subir as alterações para o _GitHub_.
+
 #### Referências
 
 FULL CYCLE 3.0. Integração contínua. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 26 mai. 2023.

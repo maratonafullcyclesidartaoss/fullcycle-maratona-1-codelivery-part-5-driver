@@ -826,8 +826,7 @@ Então, alteramos conforme as recomendações do _SonarCloud_:
 ```
 FROM golang:latest
 
-RUN addgroup -S nonroot \
-    && adduser -S nonroot -G nonroot
+RUN adduser nonroot
 
 USER nonroot
 
@@ -841,8 +840,7 @@ CMD [ "tail", "-f", "/dev/null" ]
 ```
 FROM golang:latest
 
-RUN addgroup -S nonroot \
-    && adduser -S nonroot -G nonroot
+RUN adduser nonroot
 
 USER nonroot
 
@@ -865,6 +863,62 @@ Ao subir novamente para o _GitHub_, todas as verificações passaram:
 Agora, não devemos esquecer de ir em _Settings / Branches / Branch protection rules / Edit develop_ e adicionar _SonarCloud Code Analysis_ na opção de _Require status checks to pass before merging_ e marcar a opção de _Do not allow bypassing the above settings_:
 
 ![Required statuses must pass before merging](./images/required-statuses-must-pass-before-merging.png)
+
+### Documentação da API
+
+Antes de iniciarmos com a parte de _APIOps_, vamos produzir a documentação da _API_, pois a metodologia de _APIOps_ visa, também, validar informações obrigatórias na documentação da _API_.
+
+Vamos utilizar a ferramenta _[swag](https://github.com/swaggo/swag)_ do _Go_. A partir do comando `swag init`, é gerado um diretório _docs_ contendo um arquivo _swagger.yaml_ no formato da especificação _OpenAPI_.
+
+A geração da documentação é baseada na adição de comentários em um formato declarativo no código-fonte da _API_. Por exemplo:
+
+```
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+func main() {
+}
+```
+
+Ao aplicar as alterações sugeridas pela ferramenta, temos a versão inicial da documentação para a _API Driver_:
+
+![Maratona Full Cycle Driver API](./images/maratona-fullcycle-driver-api.png)
+
+### APIOps
+
+O nosso objetivo, agora, é automatizar o processo de validação da _API_. Para isso, vamos utilizar os princípios de _APIOps_.
+
+Conforme documentação da _[Microsoft](https://learn.microsoft.com/pt-br/azure/architecture/example-scenario/devops/automated-api-deployments-apiops)_:
+
+> A APIOps é uma metodologia que aplica os conceitos de GitOps e DevOps à implantação da API. Assim como o DevOps, o APIOps ajuda os membros da equipe a fazer alterações e implantá-las de maneira iterativa e automatizada.
+
+Sendo assim, qual problema a _APIOps_ resolve?
+
+Vejamos um exemplo seguindo um processo tradicional de _deployment_ de _APIs_.
+
+No processo tradicional de _deployment_ de _APIs_ das empresas, cada um dos times tem as suas práticas de _APIs_ e, em geral, existe um time de _APIs_ dentro da empresa. Então, os outros times solicitam para esse time de _APIs_ a revisão daquele contrato deles, ou seja, daquelas _APIs_ que eles estão produzindo.
+
+O time de _APIs_ vai fazer a validação: verificar se o contrato está seguindo o que se considera como boas práticas, se há testes, etc. Se tudo estiver conforme o esperado, o time de _APIs_ irá fazer o _deployment_ para a plataforma de _APIs_ da empresa.
+
+Nesse cenário, podem acontecer alguns problemas:
+
+- Conforme o número de times for crescendo, o time de _APIs_, obrigatoriamente, precisa ir crescendo também para não se tornar um _gargalo_ no processo, pois ele precisa validar as _APIs_ de todos os times da empresa.
+- Além disso, o processo de validação pode ser um trabalho repetitivo e manual, o que tende a ser prejudicial para a estabilidade e a conformidade com os padrões, pois abre a possibilidade de a revisão ser feita de maneira incorreta.
+
+Já no cenário de _deployment_ de _APIOps_, são projetadas algumas estruturas de forma automatizada, principalmente, com o objetivo de remover o _gargalo_ do processo de revisão. A principal diferença é que o processo é automatizado, utilizando ferramentas para isso.
+
+Então, é de responsabilidade do time de _APIs_ fornecer as ferramentas e os processos para que a revisão e a entrega da _API_ em produção aconteçam de forma automatizada.
+
+Dessa forma, o processo de _APIOps_ busca:
+
+- Atender aos requisitos da empresa no que tange à _API_, ou seja, à conformidade no padrão de contrato;
+- Verificar se contém informações obrigatórias;
+- E garantir que a _API_, no formato _OpenAPI_, esteja em um padrão único da empresa para todas as _APIs_.
+
+A _APIOps_ visa, portanto, aumentar a qualidade da _API_, para que seja produzida de uma maneira uniforme, aplicando um padrão de contrato, de forma que os clientes não tenham uma experiência ruim ao integrar com nossa _API_.
 
 #### Referências
 

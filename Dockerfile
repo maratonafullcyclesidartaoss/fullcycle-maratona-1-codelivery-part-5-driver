@@ -1,10 +1,9 @@
-FROM golang:latest
+FROM golang:1.18
 
-RUN addgroup -S nonroot \
-    && adduser -S nonroot -G nonroot
+RUN adduser nonroot
 
 USER nonroot
 
 WORKDIR /app
 
-CMD [ "tail", "-f", "/dev/null" ]
+CMD ["tail", "-f", "/dev/null"]

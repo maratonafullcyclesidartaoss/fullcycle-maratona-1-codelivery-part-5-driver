@@ -15,7 +15,7 @@ jobs:
       - uses: stoplightio/spectral-action@latest
         with:
           file_glob: "docs/swagger.yaml"
-          spectral_ruleset: "docs/openapi3.spectral.yaml"
+          spectral_ruleset: "docs/openapi.spectral.yaml"
 
   check-application:
     runs-on: ubuntu-latest

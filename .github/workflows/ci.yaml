@@ -4,6 +4,19 @@ on:
     branches:
       - develop
 jobs:
+  validate:
+    name: Validate OpenAPI documentation
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the repository
+      - uses: actions/checkout@v2
+
+      # Run Spectral
+      - uses: stoplightio/spectral-action@latest
+        with:
+          file_glob: "docs/swagger.yaml"
+          spectral_ruleset: "docs/openapi3.spectral.yaml"
+
   check-application:
     runs-on: ubuntu-latest
     steps:

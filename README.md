@@ -895,33 +895,85 @@ Conforme documentação da _[Microsoft](https://learn.microsoft.com/pt-br/azure/
 
 > A APIOps é uma metodologia que aplica os conceitos de GitOps e DevOps à implantação da API. Assim como o DevOps, o APIOps ajuda os membros da equipe a fazer alterações e implantá-las de maneira iterativa e automatizada.
 
-Sendo assim, qual problema a _APIOps_ resolve?
+Sendo assim, qual(is) problema(s) a _APIOps_ resolve?
 
-Vejamos um exemplo seguindo um processo tradicional de _deployment_ de _APIs_.
+Vejamos um exemplo de processo tradicional de _deployment_ de _APIs_.
 
-No processo tradicional de _deployment_ de _APIs_ das empresas, cada um dos times tem as suas práticas de _APIs_ e, em geral, existe um time de _APIs_ dentro da empresa. Então, os outros times solicitam para esse time de _APIs_ a revisão daquele contrato deles, ou seja, daquelas _APIs_ que eles estão produzindo.
+No processo tradicional de _deployment_ de _APIs_, cada um dos times tem as suas práticas de _APIs_ e, em geral, existe um time de _APIs_ dentro da empresa. Então, os outros times solicitam para esse time de _APIs_ a revisão do contrato deles, ou seja, das _APIs_ que eles estão produzindo.
 
-O time de _APIs_ vai fazer a validação: verificar se o contrato está seguindo o que se considera como boas práticas, se há testes, etc. Se tudo estiver conforme o esperado, o time de _APIs_ irá fazer o _deployment_ para a plataforma de _APIs_ da empresa.
+O time de _APIs_ vai fazer, então, a validação: verificar se o contrato está seguindo o que eles consideram como boas práticas, se há testes, etc. Se tudo estiver em conformidade com o esperado, o time de _APIs_ realiza o _deployment_ para a plataforma de _APIs_.
 
-Nesse cenário, podem acontecer alguns problemas:
+Nesse cenário, percebe-se que alguns problemas podem acontecer:
 
 - Conforme o número de times for crescendo, o time de _APIs_, obrigatoriamente, precisa ir crescendo também para não se tornar um _gargalo_ no processo, pois ele precisa validar as _APIs_ de todos os times da empresa.
 - Além disso, o processo de validação pode ser um trabalho repetitivo e manual, o que tende a ser prejudicial para a estabilidade e a conformidade com os padrões, pois abre a possibilidade de a revisão ser feita de maneira incorreta.
 
-Já no cenário de _deployment_ de _APIOps_, são projetadas algumas estruturas de forma automatizada, principalmente, com o objetivo de remover o _gargalo_ do processo de revisão. A principal diferença é que o processo é automatizado, utilizando ferramentas para isso.
+Já no cenário de _deployment_ da _APIOps_, são projetadas algumas estruturas de forma automatizada, principalmente, com o objetivo de remover o _gargalo_ do processo de revisão. A principal diferença é que o processo é automatizado, utilizando-se ferramentas para isso.
 
-Então, é de responsabilidade do time de _APIs_ fornecer as ferramentas e os processos para que a revisão e a entrega da _API_ em produção aconteçam de forma automatizada.
+Dessa forma, é repassada ao time de _APIs_ a responsabilidade de fornecer as ferramentas e os processos para que a revisão e a entrega da _API_ em produção aconteçam de forma automatizada. Assim, o processo de _APIOps_ busca:
 
-Dessa forma, o processo de _APIOps_ busca:
+- Atender aos requisitos da empresa, no que tange à _API_, para estar em conformidade com o padrão de contrato;
+- Verificar se a _API_ contém informações obrigatórias;
+- Garantir que a _API_, no formato _OpenAPI_, esteja em um padrão único definido pela empresa para todas as _APIs_.
 
-- Atender aos requisitos da empresa no que tange à _API_, ou seja, à conformidade no padrão de contrato;
-- Verificar se contém informações obrigatórias;
-- E garantir que a _API_, no formato _OpenAPI_, esteja em um padrão único da empresa para todas as _APIs_.
+A _APIOps_ visa, por fim, aumentar a qualidade da _API_, para que seja produzida de uma maneira uniforme, aplicando um padrão de contrato, de forma que os clientes não tenham uma experiência ruim ao integrar com essa _API_.
 
-A _APIOps_ visa, portanto, aumentar a qualidade da _API_, para que seja produzida de uma maneira uniforme, aplicando um padrão de contrato, de forma que os clientes não tenham uma experiência ruim ao integrar com nossa _API_.
+### Ferramentas Necessárias
+
+Vejamos algumas ferramentas para implementar os fluxos de _APIOps_.
+
+#### GitHub Actions
+
+A idéia é que o _GitHub Actions_ é capaz de prover o mecanismo para disparar um fluxo de determinadas ações que, neste caso, envolvem a validação do contrato.
+
+Basicamente, o que iremos fazer é adicionar um novo _job_ de validação ao nosso _workflow_:
+
+```
+jobs:
+  validate:
+    name: Validate OpenAPI documentation
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the repository
+      - uses: actions/checkout@v2
+
+      # Run Spectral
+      - uses: stoplightio/spectral-action@latest
+        with:
+          file_glob: "docs/swagger.yaml"
+          spectral_ruleset: "docs/openapi.spectral.yaml"
+```
+
+#### Spectral
+
+O _Spectral_ é uma ferramenta da empresa _Spotlight (https://stoplight.io/open-source/spectral)_.
+
+O objetivo dessa ferramenta é validar determinados arquivos como, por exemplo, o arquivo _OpenAPI_ que descreve o nosso contrato (_swagger.yaml_). Assim, o _Spectral_ é capaz de aplicar _linters_, ou seja, ele identifica algumas características que ele valida baseado em níveis de severidade.
+
+Uma das principais vantagens em utilizar essa ferramenta é que ela já traz algumas validações prontas relacionadas a _OpenAPI_, simplificando o nosso trabalho, porque vai evitar que tenhamos que escrever mais arquivos _.yaml_.
+
+Dessa forma, o _Spectral_ será utilizado para aplicar a validação do contrato, garantindo a conformidade do padrão para a _API_ _Driver_.
+
+Para isso, criamos um arquivo chamado _openapi.spectral.yaml_ no diretório _docs_ que define um conjunto de regras (_Ruleset_). O arquivo que descreve a _API_ deve conter, por exemplo:
+
+- Informações de contato;
+- Nome, URL e e-mail do contato;
+- Um sumário e uma descrição para cada operação de _GET, POST, PUT, DELETE, OPTIONS_.
+
+Ao subir as alterações para o _GitHub_, verificamos que a validação da documentação _OpenAPI_ passou:
+
+![Validação da documentação OpenAPI passou](./images/validacao-documentacao-openapi-passou.png)
+
+No entanto, se, por exemplo, removemos a descrição da operação _GET_ (_ListDrivers_) no arquivo _swagger.yaml_, a validação não passa:
+
+![Validação da documentação OpenAPI não passou](./images/validacao-documentacao-openapi-nao-passou.png)
+
+Por fim, não devemos esquecer de ajustar as configurações em _Settings / Branches / Branch protection rules/ Edit develop_ e adicionar na opção de _Require status checks to pass before merging_ o _job_ de _Validate OpenAPI documentation_.
 
 #### Referências
 
 FULL CYCLE 3.0. Integração contínua. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 26 mai. 2023.
 
 FULL CYCLE 3.0. Padrões e técnicas avançadas com Git e Github. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 26 mai. 2023.
+
+FULL CYCLE 3.0. API Gateway com Kong e Kubernetes. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 31 mai. 2023.

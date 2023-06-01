@@ -28,7 +28,7 @@ tags:
 paths:
   /drivers:
     get:
-      operationId: "list-drivers"
+      operationId: "ListDrivers"
       consumes:
         - application/json
       description: List all drivers
@@ -50,7 +50,7 @@ paths:
         - drivers
   /drivers/{id}:
     get:
-      operationId: "get-driver"
+      operationId: "GetDriver"
       consumes:
         - application/json
       description: Get a driver by ID (uuid)

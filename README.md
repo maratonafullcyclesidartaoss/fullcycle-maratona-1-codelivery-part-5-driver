@@ -948,7 +948,7 @@ jobs:
 
 O _Spectral_ é uma ferramenta da empresa _Spotlight (https://stoplight.io/open-source/spectral)_.
 
-O objetivo dessa ferramenta é validar determinados arquivos como, por exemplo, o arquivo _OpenAPI_ que descreve o nosso contrato (_swagger.yaml_). Então, o _Spectral_ é capaz de aplicar _linters_, ou seja, ele identifica algumas características que ele valida baseado em níveis de severidade.
+O objetivo dessa ferramenta é validar determinados arquivos como, por exemplo, o arquivo _OpenAPI_ que descreve o nosso contrato (_swagger.yaml_). Assim, o _Spectral_ é capaz de aplicar _linters_, ou seja, ele identifica algumas características que ele valida baseado em níveis de severidade.
 
 Uma das principais vantagens em utilizar essa ferramenta é que ela já traz algumas validações prontas relacionadas a _OpenAPI_, simplificando o nosso trabalho, porque vai evitar que tenhamos que escrever mais arquivos _.yaml_.
 
@@ -958,7 +958,17 @@ Para isso, criamos um arquivo chamado _openapi.spectral.yaml_ no diretório _doc
 
 - Informações de contato;
 - Nome, URL e e-mail do contato;
-- Um sumário e uma descrição para cada operação de GET, POST, PUT, DELETE, OPTIONS.
+- Um sumário e uma descrição para cada operação de _GET, POST, PUT, DELETE, OPTIONS_.
+
+Ao subir as alterações para o _GitHub_, verificamos que a validação da documentação _OpenAPI_ passou:
+
+![Validação da documentação OpenAPI passou](./images/validacao-documentacao-openapi-passou.png)
+
+No entanto, se, por exemplo, removemos a descrição da operação _GET_ (_ListDrivers_) no arquivo _swagger.yaml_, a validação não passa:
+
+![Validação da documentação OpenAPI não passou](./images/validacao-documentacao-openapi-nao-passou.png)
+
+Por fim, não devemos esquecer de ajustar as configurações em _Settings / Branches / Branch protection rules/ Edit develop_ e adicionar na opção de _Require status checks to pass before merging_ o _job_ de _Validate OpenAPI documentation_.
 
 #### Referências
 

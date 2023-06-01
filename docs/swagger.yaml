@@ -31,7 +31,7 @@ paths:
       operationId: "ListDrivers"
       consumes:
         - application/json
-      # description: List all drivers
+      description: List all drivers
       produces:
         - application/json
       responses:

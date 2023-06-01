@@ -899,24 +899,24 @@ Sendo assim, qual(is) problema(s) a _APIOps_ resolve?
 
 Vejamos um exemplo de processo tradicional de _deployment_ de _APIs_.
 
-No processo tradicional de _deployment_ de _APIs_, cada um dos times tem as suas práticas de _APIs_ e, em geral, existe um time de _APIs_ dentro da empresa. Então, os outros times solicitam para esse time de _APIs_ a revisão do contrato deles, ou seja, das _APIs_ que eles estão produzindo.
+No processo tradicional de _deployment_ de _APIs_, cada uma das equipes na empresa tem as suas práticas de _APIs_ e, em geral, existe um time de _APIs_ dentro da empresa. Então, as outras equipes solicitam para esse time de _APIs_ a revisão do contrato delas, ou seja, das _APIs_ que elas estão produzindo.
 
-O time de _APIs_ vai fazer, então, a validação: verificar se o contrato está seguindo o que eles consideram como boas práticas, se há testes, etc. Se tudo estiver em conformidade com o esperado, o time de _APIs_ realiza o _deployment_ para a plataforma de _APIs_.
+O time de _APIs_ vai fazer, então, a validação: verificar se o contrato está seguindo o que eles consideram como boas práticas, se há testes, etc. Se tudo estiver em conformidade com o padrão esperado, o time de _APIs_ realiza o _deployment_ para a plataforma de _APIs_.
 
 Nesse cenário, percebe-se que alguns problemas podem acontecer:
 
-- Conforme o número de times for crescendo, o time de _APIs_, obrigatoriamente, precisa ir crescendo também para não se tornar um _gargalo_ no processo, pois ele precisa validar as _APIs_ de todos os times da empresa.
-- Além disso, o processo de validação pode ser um trabalho repetitivo e manual, o que tende a ser prejudicial para a estabilidade e a conformidade com os padrões, pois abre a possibilidade de a revisão ser feita de maneira incorreta.
+- Conforme o número de equipes for crescendo, o time de _APIs_, obrigatoriamente, precisa ir crescendo também para não se tornar um _gargalo_ no processo, pois ele precisa validar as _APIs_ de todas as equipes da empresa.
+- Além disso, o processo de validação pode ser um trabalho repetitivo e manual, o que tende a ser prejudicial para a estabilidade e a conformidade com os padrões, pois abre a possibilidade de revisões serem feitas de maneira incorreta.
 
-Já no cenário de _deployment_ da _APIOps_, são projetadas algumas estruturas de forma automatizada, principalmente, com o objetivo de remover o _gargalo_ do processo de revisão. A principal diferença é que o processo é automatizado, utilizando-se ferramentas para isso.
+Já no cenário de _deployment_ da _APIOps_, são projetadas algumas estruturas de forma automatizada, principalmente, com o objetivo de remover esse _gargalo_ no processo de revisão. A principal diferença é que o processo é automatizado, utilizando-se ferramentas para isso.
 
-Dessa forma, é repassada ao time de _APIs_ a responsabilidade de fornecer as ferramentas e os processos para que a revisão e a entrega da _API_ em produção aconteçam de forma automatizada. Assim, o processo de _APIOps_ busca:
+Dessa forma, é repassada ao time de _APIs_ a responsabilidade de fornecer as ferramentas e os processos para que a revisão e a entrega da _API_ em produção aconteçam de forma automatizada. Assim, no processo de _APIOps_, busca-se:
 
 - Atender aos requisitos da empresa, no que tange à _API_, para estar em conformidade com o padrão de contrato;
 - Verificar se a _API_ contém informações obrigatórias;
 - Garantir que a _API_, no formato _OpenAPI_, esteja em um padrão único definido pela empresa para todas as _APIs_.
 
-A _APIOps_ visa, por fim, aumentar a qualidade da _API_, para que seja produzida de uma maneira uniforme, aplicando um padrão de contrato, de forma que os clientes não tenham uma experiência ruim ao integrar com essa _API_.
+A _APIOps_ visa, por fim, aumentar a qualidade da _API_, para que seja produzida de uma maneira uniforme, aplicando um padrão de contrato, de forma que os clientes não tenham uma experiência ruim ao integrar com a _API_ que está sendo disponibilizada.
 
 ### Ferramentas Necessárias
 
@@ -968,7 +968,7 @@ No entanto, se, por exemplo, removemos a descrição da operação _GET_ (_ListD
 
 ![Validação da documentação OpenAPI não passou](./images/validacao-documentacao-openapi-nao-passou.png)
 
-Por fim, não devemos esquecer de ajustar as configurações em _Settings / Branches / Branch protection rules/ Edit develop_ e adicionar na opção de _Require status checks to pass before merging_ o _job_ de _Validate OpenAPI documentation_.
+Por fim, não devemos esquecer de ajustar as configurações em _Settings / Branches / Branch protection rules/ Edit develop_ e adicionar na opção de _Require status checks to pass before merging_ o _status check_ de _Validate OpenAPI documentation_.
 
 #### Referências
 

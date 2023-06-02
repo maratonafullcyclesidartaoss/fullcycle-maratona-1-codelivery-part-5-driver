@@ -272,16 +272,14 @@ git push origin feature/pull-request-template
 
 De volta ao _GitHub_, o template não vai funcionar ainda, porque é necessário subir primeiramente para _develop_ através do _PR_ que está sendo criado neste momento. Mas, para os próximos _PRs_, o _template_ já estará sendo aplicado.
 
-Apenas para testar se tudo está funcionando, vamos criar uma nova funcionalidade para, por exemplo, criar um arquivo de manifesto no diretório _k8s/driver_:
+Apenas para testar se tudo está funcionando, vamos criar uma nova funcionalidade para, por exemplo, criar um arquivo de manifesto no diretório _k8s/_:
 
 ```
 git checkout -b feature/k8s-driver
 
 mkdir k8s
 
-mkdir k8s/driver
-
-touch k8s/driver/driver.yaml
+touch k8s/driver.yaml
 ```
 
 Em seguida, comitamos e subimos para o _GitHub_:
@@ -316,7 +314,7 @@ Então, no _GitHub_, o usuário _desafiofullcyclesidartaoss_ vai acessar o _bran
 
 ![Usuário desafiofullcyclesidartaoss acessa o novo branch](./images/usuario-desafiofullcyclesidartaoss-acessa.png)
 
-Na seqüência, o usuário _desafiofullcyclesidartaoss_ edita o arquivo _k8s/driver/driver.yaml_ com suas alterações e comita.
+Na seqüência, o usuário _desafiofullcyclesidartaoss_ edita o arquivo _k8s/driver.yaml_ com suas alterações e comita.
 
 ![Usuário desafiofullcyclesidartaoss altera e comita](./images/usuario-desafiofullcyclesidartaoss-altera-e-comita.png)
 
@@ -350,7 +348,7 @@ git checkout -b feature/k8s-service
 git push origin feature/k8s-service
 ```
 
-Então, o usuário _desafiofullcyclesidartaoss_ acessa o _branch_ recém criado, adiciona uma alteração no arquivo _k8s/driver/driver.yaml_, comita a alteração, escolhe um revisor e, finalmente, cria um novo _PR_.
+Então, o usuário _desafiofullcyclesidartaoss_ acessa o _branch_ recém criado, adiciona uma alteração no arquivo _k8s/driver.yaml_, comita a alteração, escolhe um revisor e, finalmente, cria um novo _PR_.
 
 E, mesmo tendo solicitado a revisão, pode-se verificar que o botão _Merge pull request_ permanece habilitado para efetuar o _merge_.
 
@@ -1126,7 +1124,7 @@ jobs:
           tags: ${{ github.sha }}, latest
 ```
 
-O _sha_ refere-se ao código _hash_ que é gerado a partir do _commit_ e será utilizada como valor para a _tag_ para o controle de versões da imagem.
+O _sha_ refere-se ao código _hash_ que é gerado como um _ID_ de cada _commit_ e será utilizada como valor para a _tag_ para o controle de versões da imagem.
 
 Neste momento, iremos subir as alterações para o _GitHub_:
 
@@ -1138,7 +1136,7 @@ git commit -m "ci: add build"
 git push origin feature/gitops
 ```
 
-E, na seqüência, iremos gerar uma _release_:
+E, na seqüência, iremos gerar uma nova _release_:
 
 ```
 git checkout -b release/v1.0.0
@@ -1148,13 +1146,15 @@ git push origin release/v1.0.0
 
 > Não devemos esquecer de marcar a opção de _Require a pull request before merging_ nas configurações do _GitHub_ para o _branch_ _master_ (_Settings / Branches / Branch protection rules / Edit master_) e adicionar _Build_ à opção de _Require status checks to pass before merging_.
 
-No _GitHub_, verificamos que o _job_ _Build_ foi executado com sucesso:
+No _GitHub_, verificamos que o _job_ de _Build_ foi executado com sucesso:
 
 ![Job Build executado com sucesso](./images/job-build-executado-com-sucesso.png)
 
-Ao acessar o _DockerHub_, verificamos que foi gerado uma nova imagem com a _tag_ _x_. O valor da _tag_ corresponde ao _SHA_ ou _hash_ que é gerado como _ID_ de cada _commit_.
+Ao acessar o _DockerHub_, verificamos que foi gerado uma nova imagem com a _tag_ _17a00e083ef145fe6a952e50b6317875bfe18ea5_:
 
-Agora, vamos gerar uma _tag_ para a _release/v1.0.0_ e subir para o _GitHub_:r
+![Processo de CI gerou imagem com nova tag](./images/ci-gerou-imagem-com-nova-tag.png)
+
+Agora, vamos gerar, localmente, uma _tag_ para a _release/v1.0.0_ e subir para o _GitHub_:
 
 ```
 git tag -a v1.0.0 -m "version 1.0.0"
@@ -1162,9 +1162,186 @@ git tag -a v1.0.0 -m "version 1.0.0"
 git push -u origin v1.0.0
 ```
 
-Dessa forma, podemos fazer o controle das _releases_:
+Dessa forma, podemos manter o controle das _releases_ que já foram geradas:
 
 ![Tag para a release v1.0.0](./images/tag-para-release-v1-0-0.png)
+
+#### Criando manifesto Kubernetes
+
+O manifesto do _Kubernetes_ para a nossa aplicação já foi definido e encontra-se no diretório \_k8s/.
+
+A única alteração que faremos é renomear o nome da imagem no objeto _deployment_ para _driver_:
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: driver
+spec:
+  selector:
+    matchLabels:
+      app: driver
+  template:
+    metadata:
+      labels:
+        app: driver
+    spec:
+      containers:
+        - name: driver
+          image: driver
+          ports:
+            - containerPort: 8081
+```
+
+E por que definir o nome da imagem como _driver_ se não é esse o nome da imagem que será baixada do _DockerHub_? Porque o nome da imagem será alterado toda vez que rodar o processo de _CI_, utilizando-se uma ferramenta do próprio _Kubernetes_ conhecida como _Kustomize_.
+
+#### Kustomize
+
+Toda vez que alterarmos a versão da imagem, o agente vai ter que conseguir reaplicar o manifesto _Kubernetes_. Mas, para reaplicar, o manifesto vai ter que estar com a versão correta, ou seja, a última versão que corresponda ao _branch_ master no repositório do _GitHub_.
+
+Então, como atualizar a versão da imagem no manifesto?
+
+Para isso, existem algumas possibilidades, como trabalhar com _Helm_, alterando o pacote do _Helm_, ou trabalhar com uma ferramenta do _Kubernetes_ chamada de _Kustomize_ (https://kustomize.io/).
+
+A idéia do _Kustomize_ é criar um arquivo junto aos manifestos, por exemplo, _kustomization.yaml_, aonde se definem os _resources_, ou seja, os manifestos que a ferramenta vai ler e, em seguida, o nome da imagem que se quer customizar, junto com o novo nome e a nova tag para os quais se quer mudar.
+
+```
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - driver.yaml
+
+images:
+  - name: driver
+    newName: sidartasilva/fullcycle-maratona-1-codelivery-part-5-driver
+    newTag: newtag
+```
+
+Ou seja, quando o _Kustomize_ rodar, ele vai obter a imagem no arquivo _driver.yaml_ e vai customizá-la conforme definido no manifesto do _Kustomize_ que, neste caso, é o _kustomization.yaml_.
+
+O nosso objetivo, ao final, é, no processo de _CD_, alterar o valor de _newTag_ em _kustomization.yaml_ pelo _SHA_ do _GitHub_ e comitar no próprio repositório. Assim, o agente vai ficar monitorando o arquivo do _Kustomize_ e, quando a versão da imagem mudar no arquivo, ele vai sincronizar a versão do repositório no _GitHub_ com a versão no _cluster Kubernetes_.
+
+#### Fluxo de CD
+
+A primeira coisa que faremos, no nosso fluxo de _CD_, é instalar o _Kustomize_:
+
+```
+name: cd-driver
+on:
+  pull_request:
+    branches:
+      - master
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build and push image to DockerHub
+        uses: docker/build-push-action@v1.1.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ${{ secrets.DOCKER_USERNAME }}/fullcycle-maratona-1-codelivery-part-5-driver
+          tags: ${{ github.sha }}, latest
+
+      - name: Setup Kustomize
+        uses: imranismail/setup-kustomize@v1
+        with:
+          kustomize-version: "3.6.1"
+```
+
+Agora que o _Kustomize_ está instalado, vamos alterar o valor da propriedade _newTag_ no arquivo _kustomization.yaml_:
+
+```
+name: cd-driver
+on:
+  pull_request:
+    branches:
+      - master
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build and push image to DockerHub
+        uses: docker/build-push-action@v1.1.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ${{ secrets.DOCKER_USERNAME }}/fullcycle-maratona-1-codelivery-part-5-driver
+          tags: ${{ github.sha }}, latest
+
+      - name: Setup Kustomize
+        uses: imranismail/setup-kustomize@v1
+        with:
+          kustomize-version: "3.6.1"
+
+      - name: Update Kubernetes resources
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        run: |
+          cd k8s
+          kustomize edit set image driver=$DOCKER_USERNAME/fullcycle-maratona-1-codelivery-part-5-driver:$GITHUB_SHA
+```
+
+E, por fim, vamos comitar na máquina _ubuntu_ e fazer o _push_ para o repositório do _GitHub_:
+
+```
+name: cd-driver
+on:
+  pull_request:
+    branches:
+      - master
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build and push image to DockerHub
+        uses: docker/build-push-action@v1.1.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ${{ secrets.DOCKER_USERNAME }}/fullcycle-maratona-1-codelivery-part-5-driver
+          tags: ${{ github.sha }}, latest
+
+      - name: Setup Kustomize
+        uses: imranismail/setup-kustomize@v1
+        with:
+          kustomize-version: "3.6.1"
+
+      - name: Update Kubernetes resources
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        run: |
+          cd k8s
+          kustomize edit set image driver=$DOCKER_USERNAME/fullcycle-maratona-1-codelivery-part-5-driver:$GITHUB_SHA
+
+      - name: Commit
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -am "Bump docker version"
+
+      - name: Push
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          repository: maratonafullcyclesidartaoss/fullcycle-maratona-1-codelivery-part-5-driver
+```
 
 #### Referências
 

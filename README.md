@@ -1126,7 +1126,7 @@ jobs:
           tags: ${{ github.sha }}, latest
 ```
 
-O _sha_ refere-se ao código _hash_ que é gerado a partir do _commit_ e será utilizada como _tag_ para o controle de versões da imagem.
+O _sha_ refere-se ao código _hash_ que é gerado a partir do _commit_ e será utilizada como valor para a _tag_ para o controle de versões da imagem.
 
 Neste momento, iremos subir as alterações para o _GitHub_:
 
@@ -1145,6 +1145,26 @@ git checkout -b release/v1.0.0
 
 git push origin release/v1.0.0
 ```
+
+> Não devemos esquecer de marcar a opção de _Require a pull request before merging_ nas configurações do _GitHub_ para o _branch_ _master_ (_Settings / Branches / Branch protection rules / Edit master_) e adicionar _Build_ à opção de _Require status checks to pass before merging_.
+
+No _GitHub_, verificamos que o _job_ _Build_ foi executado com sucesso:
+
+![Job Build executado com sucesso](./images/job-build-executado-com-sucesso.png)
+
+Ao acessar o _DockerHub_, verificamos que foi gerado uma nova imagem com a _tag_ _x_. O valor da _tag_ corresponde ao _SHA_ ou _hash_ que é gerado como _ID_ de cada _commit_.
+
+Agora, vamos gerar uma _tag_ para a _release/v1.0.0_ e subir para o _GitHub_:r
+
+```
+git tag -a v1.0.0 -m "version 1.0.0"
+
+git push -u origin v1.0.0
+```
+
+Dessa forma, podemos fazer o controle das _releases_:
+
+![Tag para a release v1.0.0](./images/tag-para-release-v1-0-0.png)
 
 #### Referências
 

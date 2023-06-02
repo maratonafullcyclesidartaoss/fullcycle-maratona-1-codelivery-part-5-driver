@@ -994,7 +994,7 @@ Por fim, devemos rodar um comando para configurar o _kubectl_ com credenciais de
 gcloud container clusters get-credentials $(terraform output -raw kubernetes_cluster_name) --region $(terraform output -raw region)
 ```
 
-E para confirmar a criação dos nós, é só rodar:
+E, para confirmar a criação dos nós, é só rodar:
 
 ```
 kubectl get nodes
@@ -1012,6 +1012,140 @@ E, agora que provisonamos um _cluster_ _Kubernetes_, podemos iniciar o processo 
 
 <Introdução GitOps>
 
+#### Criando imagem Docker
+
+Neste momento, vamos refatorar o arquivo _Dockerfile_, porque ele será utilizado no processo de _GitOps_.
+
+Então, vamos remover o arquivo _Dockerfile.prod_ e substituir o conteúdo no arquivo _Dockerfile_ por:
+
+```
+FROM golang:1.19 AS build
+
+WORKDIR /app
+
+COPY . .
+
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build driver.go
+
+FROM scratch
+WORKDIR /app
+COPY --from=build /app/driver  /app/.env /app/drivers.json ./
+
+ENTRYPOINT [ "./driver" ]
+```
+
+Em seguida, para testar o _Dockerfile_, vamos criar uma imagem.
+
+```
+docker build -t sidartasilva/fullcycle-maratona-1-codelivery-part-5-driver .
+```
+
+Vamos verificar, também, se está tudo funcionando a partir do _container_:
+
+```
+docker run --rm -p 8081:8081 sidartasilva/fullcycle-maratona-1-codelivery-part-5-driver
+
+2023/06/02 18:20:58 alive
+```
+
+E, por fim, vamos subir essa imagem para o _DockerHub_:
+
+```
+docker push sidartasilva/fullcycle-maratona-1-codelivery-part-5-driver
+```
+
+#### Criando fluxo de geração da imagem
+
+A idéia, neste momento, é criar um _pipeline_ de _CI_ para baixar o projeto , fazer o _build_ e subir a imagem no _DockerHub_. E, para criar o _pipeline_, iremos utilizar o _GitHub Actions_.
+
+O _workflow_ será disparado toda vez que for feito um _PR_ para o _branch_ _master_. Como estamos utilizando a metologia de _GitFlow_, isso irá acontecer toda vez que for gerada uma nova _release_.
+
+```
+name: cd-driver
+on:
+  pull_request:
+    branches:
+      - master
+```
+
+O _job_ irá executar uma tarefa chamada de _Build_ a partir de uma máquina _ubuntu_ que o _GitHub Actions_ irá preparar:
+
+```
+name: cd-driver
+on:
+  pull_request:
+    branches:
+      - master
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+```
+
+O nosso primeiro passo será o de _checkout_ do código, ou seja, obter o código que está no repositório e baixar para a máquina _ubuntu_:
+
+```
+name: cd-driver
+on:
+  pull_request:
+    branches:
+      - master
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+```
+
+Agora que o _GitHub Actions_ baixou o código, nós vamos fazer o _build_ da imagem e subir para o _DockerHub_.
+
+```
+name: cd-driver
+on:
+  pull_request:
+    branches:
+      - master
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build and push image to DockerHub
+        uses: docker/build-push-action@v1.1.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ${{ secrets.DOCKER_USERNAME }}/fullcycle-maratona-1-codelivery-part-5-driver
+          tags: ${{ github.sha }}, latest
+```
+
+O _sha_ refere-se ao código _hash_ que é gerado a partir do _commit_ e será utilizada como _tag_ para o controle de versões da imagem.
+
+Neste momento, iremos subir as alterações para o _GitHub_:
+
+```
+git add .
+
+git commit -m "ci: add build"
+
+git push origin feature/gitops
+```
+
+E, na seqüência, iremos gerar uma _release_:
+
+```
+git checkout -b release/v1.0.0
+
+git push origin release/v1.0.0
+```
+
 #### Referências
 
 FULL CYCLE 3.0. Integração contínua. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 26 mai. 2023.
@@ -1023,3 +1157,5 @@ FULL CYCLE 3.0. API Gateway com Kong e Kubernetes. 2023. Disponível em: <https:
 SPECTRAL. Create a Ruleset. 2023. Disponível em: <https://meta.stoplight.io/docs/spectral/01baf06bdd05a-create-a-ruleset>. Acesso em: 01 jun. 2023.
 
 TERRAFORM. Provision a GKE Cluster (Google Cloud). 2023. Disponível em: <https://developer.hashicorp.com/terraform/tutorials/kubernetes/gke>. Acesso em: 01 jun. 2023.
+
+FULL CYCLE 3.0. GitOps. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 02 jun. 2023.

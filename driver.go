@@ -11,7 +11,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
-	_ "github.com/sidartaoss/maratona-fullcycle-1/part-5/driver/docs"
+	_ "github.com/sidartaoss/maratona-fullcycle-1/driver/docs"
 	httpSwagger "github.com/swaggo/http-swagger"
 	_ "github.com/swaggo/swag/example/celler/httputil"
 )

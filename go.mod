@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/go-chi/chi/v5 v5.0.8
 	github.com/gorilla/mux v1.8.0
+	github.com/joho/godotenv v1.5.1
 	github.com/swaggo/http-swagger v1.3.4
 	github.com/swaggo/swag v1.16.1
 	github.com/swaggo/swag/example/celler v0.0.0-20230512013204-ea35767c559f

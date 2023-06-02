@@ -812,55 +812,14 @@ Em relação à cobertura de código:
 
 Em relação aos problemas de segurança, eles foram identificados no _Dockerfile_ e no _Dockerfile.prod_:
 
-- Copying recursively might inadvertently add sensitive data to the container. Make sure it is safe here.
-- The golang image runs with root as the default user. Make sure it is safe here.
+- _Copying recursively might inadvertently add sensitive data to the container. Make sure it is safe here._
+- _The golang image runs with root as the default user. Make sure it is safe here._
 
-Em relação ao _code smell_, ele também foi identificado no _Dockerfile.prod_:
+Em relação ao _code smell_, ele foi identificado no _Dockerfile.prod_:
 
-- Replace `as` with upper case format `AS`.
+- _Replace `as` with upper case format `AS`_.
 
-Então, alteramos conforme as recomendações do _SonarCloud_:
-
-- Dockerfile
-
-```
-FROM golang:latest
-
-RUN adduser nonroot
-
-USER nonroot
-
-WORKDIR /app
-
-CMD [ "tail", "-f", "/dev/null" ]
-```
-
-- Dockerfile.prod
-
-```
-FROM golang:latest
-
-RUN adduser nonroot
-
-USER nonroot
-
-WORKDIR /app
-
-COPY driver.go .
-COPY drivers.json .
-COPY go.mod .
-COPY go.sum .
-
-RUN GOOS=linux go build driver.go
-
-CMD ["./driver"]
-```
-
-Ao subir novamente para o _GitHub_, todas as verificações passaram:
-
-![Todas as verificações passaram - SonarCloud](./images/all-checks-have-passed-sonar-cloud.png)
-
-Agora, não devemos esquecer de ir em _Settings / Branches / Branch protection rules / Edit develop_ e adicionar _SonarCloud Code Analysis_ na opção de _Require status checks to pass before merging_ e marcar a opção de _Do not allow bypassing the above settings_:
+Não devemos esquecer também de ir em _Settings / Branches / Branch protection rules / Edit develop_ e adicionar _SonarCloud Code Analysis_ na opção de _Require status checks to pass before merging_ e marcar a opção de _Do not allow bypassing the above settings_:
 
 ![Required statuses must pass before merging](./images/required-statuses-must-pass-before-merging.png)
 
@@ -977,3 +936,7 @@ FULL CYCLE 3.0. Integração contínua. 2023. Disponível em: <https://plataform
 FULL CYCLE 3.0. Padrões e técnicas avançadas com Git e Github. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 26 mai. 2023.
 
 FULL CYCLE 3.0. API Gateway com Kong e Kubernetes. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 31 mai. 2023.
+
+SPECTRAL. Create a Ruleset. 2023. Disponível em: <https://meta.stoplight.io/docs/spectral/01baf06bdd05a-create-a-ruleset>. Acesso em: 01 jun. 2023.
+
+TERRAFORM. Provision a GKE Cluster (Google Cloud). 2023. Disponível em: <https://developer.hashicorp.com/terraform/tutorials/kubernetes/gke>. Acesso em: 01 jun. 2023.

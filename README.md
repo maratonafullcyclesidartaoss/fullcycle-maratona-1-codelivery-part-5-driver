@@ -807,8 +807,8 @@ Ao clicar no link _Details_ de _SonarCloud Code Analysis_:
 Em relação à cobertura de código:
 
 - Clicamos no _link_ de _24.0% Coverage_;
-- Abaixo no menu esquerdo, vamos em _Administration / Quality Gate_ / Organization's settings e selecionamos ou criamos um novo _Quality Gate_. Neste caso, vamos selecionar _Maratona Quality Gate_;
-- Na métrica de _Coverage_, nós vamos setar um novo valor de 15%;
+- Abaixo, no menu esquerdo, vamos em _Administration / Quality Gate_ / Organization's settings e selecionamos ou criamos um novo _Quality Gate_. Neste caso, vamos selecionar _Maratona Quality Gate_;
+- Na métrica de _Coverage_, vamos setar um novo valor de 20%;
 
 Em relação aos problemas de segurança, eles foram identificados no _Dockerfile_ e no _Dockerfile.prod_:
 
@@ -928,6 +928,89 @@ No entanto, se, por exemplo, removemos a descrição da operação _GET_ (_ListD
 ![Validação da documentação OpenAPI não passou](./images/validacao-documentacao-openapi-nao-passou.png)
 
 Por fim, não devemos esquecer de ajustar as configurações em _Settings / Branches / Branch protection rules/ Edit develop_ e adicionar na opção de _Require status checks to pass before merging_ o _status check_ de _Validate OpenAPI documentation_.
+
+### Terraform
+
+Antes de iniciarmos o processo de _Continuous Delivery_, precisamos criar um _cluster_ _Kubernetes_. Neste projeto, iremos trabalhar com o _Google Kubernetes Engine_ (_GKE)_.
+
+Mas, desta vez, não iremos criar a partir do painel do _Google Cloud Platform (GCP)_; iremos provisionar via _Infrastructure As Code_ (_IaC_), utilizando o _Terraform_.
+
+<Texto Introdução Terraform>
+
+Seguindo o tutorial do _Terraform_ para provisionar um _cluster GKE_:
+
+- Um dos pré-requisitos é termos o _gcloud_ instalado na máquina local;
+- Vamos rodar o comando: `gcloud init` para setar o `gcloud` com algumas configurações padrões, como projeto, zona e região;
+
+![Gcloud inicializar configurações](./images/gcloud-inicializar-configuracoes.png)
+
+Em seguida, vamos rodar o comando: `gcloud auth application-default login` para autenticar com a _CLI gcloud_. Isso permitirá que o _Terraform_ acesse as credenciais para provisionar recursos na _Google Cloud_.
+
+Na seqüência, vamos clonar uma configuração de exemplo para a pasta _/terraform_:
+
+```
+mkdir terraform
+cd terraform/
+
+git clone https://github.com/hashicorp/learn-terraform-provision-gke-cluster
+```
+
+Devemos atualizar o arquivo _terraform.tfvars_ com _project_id_ e _region_:
+
+```
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
+project_id = "maratona-fullcycle-388513"
+region     = "us-central1"
+```
+
+Vamos alterar também o arquivo _gke.tf_ em _gke_num_nodes_ de 2 para 1. Isso porque um _pool_ de nós será provisionado em cada uma das três zonas da região para fornecer alta disponibilidade, totalizando 3 nós no _cluster_.
+
+```
+variable "gke_num_nodes" {
+  default     = 1
+  description = "number of gke nodes"
+}
+```
+
+Neste momento, podemos inicializar o _workspace_ do _Terraform_, que irá baixar e inicializar o provedor do _Google Cloud_ com os valores informados em _terraform.tfvars_:
+
+```
+terraform init
+```
+
+Depois, dentro do diretório inicializado, rodamos o comando `terraform apply` e revisamos as ações planejadas. A saída no _terminal_ indicará que o plano está em execução e quais os recursos que serão criados: uma _VPC_, uma _subnet_, o _cluster GKE_ e um _pool_ de nós do _GKE_.
+
+![Plano do Terraform para criar cluster GKE](./images/plano-terraform-criar-cluster-gke.png)
+
+Após confirmar, o processo de provisionamento pode durar cerca de 10 minutos. Ao final, o _terminal_ irá mostrar os valores definidos para o nome e o _host_ do _cluster_ _GKE_:
+
+![Valores definidos para o nome e o host do cluster GKE](./images/nome-e-host-do-cluster-gke.png)
+
+Por fim, devemos rodar um comando para configurar o _kubectl_ com credenciais de acesso:
+
+```
+gcloud container clusters get-credentials $(terraform output -raw kubernetes_cluster_name) --region $(terraform output -raw region)
+```
+
+E para confirmar a criação dos nós, é só rodar:
+
+```
+kubectl get nodes
+
+NAME                                                  STATUS   ROLES    AGE     VERSION
+gke-maratona-fullcyc-maratona-fullcyc-12d4c0b5-2j7d   Ready    <none>   4m49s   v1.25.8-gke.500
+gke-maratona-fullcyc-maratona-fullcyc-7a340d65-wkbg   Ready    <none>   4m51s   v1.25.8-gke.500
+gke-maratona-fullcyc-maratona-fullcyc-f97e39ff-dvzw   Ready    <none>   4m51s   v1.25.8-gke.500
+
+```
+
+### GitOps
+
+E, agora que provisonamos um _cluster_ _Kubernetes_, podemos iniciar o processo de _Continuous Delivery_, seguindo o modelo de _GitOps_.
+
+<Introdução GitOps>
 
 #### Referências
 

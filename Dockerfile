@@ -1,8 +1,4 @@
-FROM golang:1.18
-
-RUN adduser nonroot
-
-USER nonroot
+FROM golang:1.19
 
 WORKDIR /app
 

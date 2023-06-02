@@ -10,7 +10,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/gorilla/mux"
-	_ "github.com/sidartaoss/maratona-fullcycle-1/driver/docs"
+	"github.com/joho/godotenv"
+	_ "github.com/sidartaoss/maratona-fullcycle-1/part-5/driver/docs"
 	httpSwagger "github.com/swaggo/http-swagger"
 	_ "github.com/swaggo/swag/example/celler/httputil"
 )
@@ -22,6 +23,13 @@ type Driver struct {
 
 type Drivers struct {
 	Drivers []Driver
+}
+
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		panic("Error loading .env file")
+	}
 }
 
 func loadDrivers() []byte {
@@ -112,12 +120,16 @@ func main() {
 	log.Println("alive")
 
 	r := chi.NewRouter()
+
 	r.Use(middleware.Logger)
 
 	r.Get("/drivers", ListDrivers)
+
 	r.Get("/drivers/{id}", GetDriver)
 
-	r.Get("/docs/*", httpSwagger.Handler(httpSwagger.URL("http://host.docker.internal:8081/docs/doc.json")))
+	u := "http://" + os.Getenv("SWAGGER_HOST") + ":" + os.Getenv("SWAGGER_PORT") + "/docs/doc.json"
+
+	r.Get("/docs/*", httpSwagger.Handler(httpSwagger.URL(u)))
 
 	http.ListenAndServe(":8081", r)
 }

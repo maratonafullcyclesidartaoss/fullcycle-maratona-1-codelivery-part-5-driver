@@ -36,20 +36,25 @@ Nesta quinta versão, trabalhamos a parte de _Continuous Integration_ e _Continu
 
   - Golang
 
-- CI (Continuous Integration)
+- Continuous Integration (_CI_)
 
   - GitHub Actions
 
-- CD (Continuous Deploy)
+- Continuous Deploy (_CD_)
 
   - Google Cloud Build
 
 - Deploy
+
   - Kubernetes GKE
+
+- Infrastructure as Code (_IaC_)
+
+  - Terraform
 
 ### O que faremos
 
-O objetivo deste projeto é cobrir um processo de desenvolvimento do começo ao fim, desde:
+O objetivo deste projeto é cobrir um processo simples de desenvolvimento do início ao fim, desde:
 
 - A utilização de uma metodologia para se trabalhar com o Git - o GitFlow;
 - A adoção de Conventional Commits como especificação para as mensagens de commits;
@@ -64,12 +69,10 @@ Realizando, por fim:
 
 - O deploy da aplicação em um cluster Kubernetes junto a um cloud provider.
 
-Assim, seguimos uma seqüência de passos:
+Assim, seguiremos uma seqüência de passos:
 
-1. Definição da metodologia de Git Flow;
-
+1. Utilização da metodologia de Git Flow;
 2. Definição de um nova Organização no GitHub;
-
 3. Configuração de branches no GitHub;
 
 - Filtros por branches;
@@ -80,22 +83,17 @@ Assim, seguimos uma seqüência de passos:
 - Templates para PRs;
 
 5. Configuração de Code Review no GitHub;
-
 6. Configuração de CODEOWNERS no GitHub;
-
 7. GitHub Actions;
-
 8. Integração do SonarCloud Scan (Linter) ao GitHub Actions;
-
-9. Definição de um cluster GKE utilizando Terraform;
-
+9. Provisionamento de um cluster GKE utilizando Terraform;
 10. Deploy da aplicação utilizando o Google Cloud Build integrado ao GitHub Actions;
 
-### Definição da metodologia de Git Flow
+### Utilização da metodologia de Git Flow
 
 - Qual é o problema que o Git Flow resolve?
 
-Na verdade, o Git Flow é uma metodologia de trabalho que visa simplificar e organizar o processo que envolve o versionamento de código-fonte. Portanto, ele resolve alguns problemas, como, por exemplo:
+Na verdade, o Git Flow é uma metodologia de trabalho que visa simplificar e organizar o processo que envolve o versionamento de código-fonte. Portanto, ele resolve um conjunto de problemas, como, por exemplo:
 
 - Como definir um branch para uma correção?
 - Como definir um branch para uma funcionalidade nova?
@@ -103,13 +101,13 @@ Na verdade, o Git Flow é uma metodologia de trabalho que visa simplificar e org
 - Como saber se o que está no branch master é o mesmo que está em Produção?
 - Como saber se existe um branch de desenvolvimento?
 
-Vejamos, então, dois cenários simples do dia-a-dia aonde é empregado o Git Flow.
+Vejamos, então, dois cenários deste projeto aonde será empregado o Git Flow.
 
 #### Cenário I
 
-Neste cenário, há a definição de um branch master, também conhecido como o branch da verdade, porque, normalmente, o que está no master equivale ao que está em Produção.
+Neste cenário, há a definição de um _branch master_, também conhecido como _o branch da verdade_, porque, normalmente, o que está no _master_ equivale ao que está em Produção.
 
-O Git Flow recomenda que não se commit diretamente no branch master. O master não deve ser um local onde se consolidam todas as novas funcionalidades.
+O Git Flow recomenda que não se commita diretamente no _branch master_. O _master_ não deve ser um local onde se consolidam todas as novas funcionalidades.
 
 Então, o Git Flow define um branch auxiliar para que, quando todas as funcionalidades novas forem agregadas no branch auxiliar, aí sim elas são jogadas para o branch master. Esse branch auxiliar é chamado de _develop_.
 
@@ -131,9 +129,9 @@ Estando tudo correto, pode-se fazer o merge. E, a partir do merge, é gerada uma
 
 ### Definição de um nova Organização no GitHub
 
-Antes de realizarmos o nosso primeiro commit no GitHub, é necessário atentar que, para trabalhar no GitHub de forma colaborativa, ou seja, aonde haja a participação de outros colaboradores nos repositórios, é necessário criar uma organização onde os colaboradores possam ser vinculados.
+Antes de realizarmos o nosso primeiro _commit_ no _GitHub_, é necessário atentar que, para trabalhar no _GitHub_ de forma colaborativa, ou seja, aonde haja a participação de outros colaboradores nos repositórios, é necessário criar uma organização onde os colaboradores possam ser vinculados.
 
-Nesse sentido, criamos uma organização fictícia, a _maratonafullcyclesidartaoss_ e vinulamos 3 usuários do GitHub a essa organização, conforme a definição abaixo:
+Nesse sentido, criamos uma organização fictícia, a _maratonafullcyclesidartaoss_ e vinculamos 3 usuários do GitHub a essa organização, conforme a definição abaixo:
 
 ![Nova organização e usuários do GitHub vinculados](./images/nova-organizacao-e-usuarios-vinculados.png)
 
@@ -143,7 +141,7 @@ Logo, para o commit da aplicação driver:
 
 ![Criação do repositório Driver](./images/criacao-repositorio-driver.png)
 
-2. Para dar o push inicial da aplicação no GitHub:
+2. E para dar o _push_ inicial da aplicação no _GitHub_:
 
 ```
 git init
@@ -159,19 +157,271 @@ git push -u origin master
 
 ### Configuração de branches no GitHub
 
-São consideradas boas práticas e que dão maior segurança e tranqüilidade à equipe no momento de trabalhar com um repositório do GitHub:
+São consideradas boas práticas que dão mais segurança e tranqüilidade aos membros da equipe ao trabalhar com repositórios no GitHub:
 
-- Não comitar diretamente no master;
-- Não comitar diretamente no develop;
-- Sempre trabalhar com Pull Requests.
+- Nunca comitar diretamente no _branch master_;
+- Nunca comitar diretamente no _branch develop_;
+- Sempre trabalhar com _Pull Requests_.
 
-### PRs e Code Review
+Sendo assim, a seguir, são feitas algumas configurações básicas para a proteção dos _branches_.
+
+### Protegendo branches
+
+A princípio, o repositório é criado apenas com o _branch master_. Então, deve-se criar o _branch develop_ também:
+
+```
+git checkout -b develop
+
+git push origin develop
+```
+
+![Criação branch develop](./images/criacao-branch-develop.png)
+
+Dessa forma, o _branch master_ não será mais o _branch_ padrão. Ele será um _branch_ que utilizaremos como base para verificar se o que está nele equivale ao que está em Produção.
+
+E o _branch_ padrão que utizaremos para comitar, conforme o processo de _Git Flow_, será o _develop_.
+
+Neste momento, então, nós vamos nas configurações do _GitHub_, em _Settings_ / _Default branch_ e alteramos de _master_ para _develop_, para garantir que os _commits_ não serão feitos diretamente para o _branch master_.
+
+Outra configuração importante refere-se à parte de proteção. Para isso, ao acessar _Settings / Branches / Branch protection rules_, é possível adicionar regras de proteção para os _branches_.
+
+Primeiramente, faremos a proteção do _branch master_. Neste momento, nós iremos restringir o _push_ para alguns grupos ou pessoas, ao marcar a opção _Restrict who can push to matching branches_. Por ora, é isso. Clicamos em Create.
+
+Em seguida, fazemos a proteção do _branch develop_, da mesma forma que fizemos com o _branch master_.
+
+Após configurar uma proteção mínima para os _branches_, vamos adicionar os colaboradores do repositório. Para isso, vamos em _Settings / Collaborators and teams / Manage access_ e clicamos em _Add people_. Adicionamos os usuários _sidartaoss_ e _imersaofullcyclesidartaoss_ no papel de _Admin_ e _desafiofullcyclesidartaoss_ no papel de _Maintain_.
+
+### Pull Requests
+
+Primeiramente, nós criamos um novo _branch_ para uma nova funcionalidade:
+
+```
+git checkout -b feature/update-readme
+```
+
+Vamos alterar o arquivo _README.md_ e adicionar um arquivo no diretório _images_. Então, damos um _commit_ e um _push_ para subir no _GitHub_:
+
+```
+git add .
+
+git commit -m "docs: update readme.md"
+
+git push origin feature/update-readme
+```
+
+O repositório no GitHub verifica que um novo branch chamado feature/update-readme subiu e já oferece a opção de comparar esse branch com os demais branches do repositório e já realizar uma _Pull Request_.
+
+![Compare & pull request](./images/compare-and-pull-request.png)
+
+Ao clicar em _Compare & pull request_, o GitHub mostra a opção de solicitar uma _Pull Request_ (_PR_) para o branch _develop_. Todas às vezes em que é criado um _PR_, é necessário detalhar sobre o que se trata o _PR_ na parte de comentários. Então, após deixar um comentário, clica-se em _Create pull request_.
+
+A partir deste momento, caso não haja nenhum conflito impedindo, é possível realizar o _merge_ para _develop_. Então, é só clicar em _Merge pull request_ e _Confirm merge_.
+
+O _GitHub_ aproveita para sugerir que deletemos o branch _feature/update-readme_, uma vez que já foi mergeado. Após deletar o _branch_ no _GitHub_, é necessário, também, deletar na máquina local:
+
+```
+git checkout develop
+
+git pull origin develop
+
+git branch
+
+git branch -d feature/update-readme
+
+git branch
+```
+
+### Criando Template para PRs
+
+Toda vez em que é criado um _PR_, é possível adicionar um detalhamento na parte de comentários para esse _PR_.
+
+No entanto, esse detalhamento pode deixar muito a desejar, porque pode ficar em um escopo muito aberto.
+
+Por conta disso, é possível trabalhar com a utilização de _templates_ para _PRs_. Então, toda vez que for criado um novo _PR_, um _template_ pré-montado é apresentado à pessoa que esteja criando o _PR_ para que ela possa seguir algumas diretrizes.
+
+Nesse sentido, vamos utilizar um _template_ baseado em um modelo disponível no _site_ _Embedded Artistry_: `https://embeddedartistry.com/blog/2017/08/04/a-github-pull-request-template-for-your-projects`.
+
+A partir desse modelo, nós vamos criar um arquivo chamado _PULL_REQUEST_TEMPLATE.md_ dentro do diretório _.github_.
+
+O _checklist_ de opções vai depender de cada projeto e das necessidades de cada equipe, mas, o mais importante é ter o modelo de _template_; a partir dele, é possível adaptar o _checklist_ às demandas de cada time.
+
+Então, criamos o _template_ a partir de uma nova funcionalidade:
+
+```
+git checkout -b feature/pull-request-template
+
+```
+
+Criamos um diretório chamado _.github_ e, dentro desse diretório, o arquivo _PULL_REQUEST_TEMPLATE_.md\_.
+
+```
+mkdir .github
+
+touch .github/PULL_REQUEST_TEMPLATE.md
+```
+
+Colamos nesse arquivo o conteúdo do _site_ _Embedded Artistry_. Em seguida, comitamos e subimos para o _GitHub_.
+
+```
+git add .
+
+git commit -m "chore: add pull request template"
+
+git push origin feature/pull-request-template
+```
+
+De volta ao _GitHub_, o template não vai funcionar ainda, porque é necessário subir primeiramente para _develop_ através do _PR_ que está sendo criado neste momento. Mas, para os próximos _PRs_, o _template_ já estará sendo aplicado.
+
+Apenas para testar se tudo está funcionando, vamos criar uma nova funcionalidade para, por exemplo, criar um arquivo de manifesto no diretório _k8s/driver_:
+
+```
+git checkout -b feature/k8s-driver
+
+mkdir k8s
+
+mkdir k8s/driver
+
+touch k8s/driver/driver.yaml
+```
+
+Em seguida, comitamos e subimos para o _GitHub_:
+
+```
+git add .
+
+git commit -m "chore: add k8s manifesto to driver"
+
+git push origin feature/k8s-driver
+```
+
+Conforme esperado, ao acessar o repositório no _GitHub_, está sendo exibido o _template_ ao criar um novo _PR_.
+
+![Template para pull request](./images/template-para-pull-request.png)
+
+### Code Review
+
+É extremamente importante ter, quando se está trabalhando em equipe, um ou mais colegas revisando o seu código. Por quê? Porque, quando se está trabalhando em equipe, todos são responsáveis pela entrega do projeto. Então, quando algúem envia um código para revisão, a pessoa que está revisando também é responsável por aquele código.
+
+Para ver o processo de _code review_ no _GitHub_, nós vamos trabalhar com o usuário _desafiofullcyclesidartaoss_ criando um novo _PR_. Esse _PR_ deve ser revisado, posteriormente, pelo usuário _sidartaoss_.
+
+Primeiramente, o usuário _sidartaoss_ criará um _branch_ para uma nova funcionalidade e subirá para o _GitHub_:
+
+```
+git checkoub -b feature/k8s-driver-deployment
+
+git push origin feature/k8s-driver-deployment
+```
+
+Então, no _GitHub_, o usuário _desafiofullcyclesidartaoss_ vai acessar o _branch_ _feature/k8s-driver-deployment_.
+
+![Usuário desafiofullcyclesidartaoss acessa o novo branch](./images/usuario-desafiofullcyclesidartaoss-acessa.png)
+
+Na seqüência, o usuário _desafiofullcyclesidartaoss_ edita o arquivo _k8s/driver/driver.yaml_ com suas alterações e comita.
+
+![Usuário desafiofullcyclesidartaoss altera e comita](./images/usuario-desafiofullcyclesidartaoss-altera-e-comita.png)
+
+Antes de criar o _PR_, o usuário _desafiofullcyclesidartaoss_ vai poder selecionar um revisor para realizar o _code review_ do seu código. Neste caso, será selecionado o usuário _sidartaoss_ como revisor (_Reviewer_).
+
+![Usuário sidartaoss selecionado para revisão](./images/usuario-sidartaoss-selecionado-para-revisao.png)
+
+Após criar o _PR_, o usuário _sidartaoss_ vai perceber, então, que, na aba _Pull requests_, há um _PR_ aguardando revisão. Ao acessá-la, surge, na tela, uma mensagem para adicionar uma nova revisão.
+
+![Adicionar nova revisão](./images/adicionar-nova-revisao.png)
+
+Ao clicar em _Add your review_, caso seja necessário solicitar alguma alteração no código, o revisor (usuário _sidartaoss_) vai adicionar um comentário, clicar em _Start a review_ / _Review chages_, escolher a opção _Request changes_ e clicar em _Submit review_.
+
+Então, o usuário _desafiofullcyclesidartaoss_ acessa a aba _Files changed_, clica em _Edit file_ e efetua a correção solicitada. Ao finalizar, comita as mudanças no mesmo _branch_ em que foi criado o _PR_. Assim, o _branch_ e o _PR_ são atualizados automaticamente.
+
+Depois disso, o usuário _desafiofullcyclesidartaoss_ acessa o _PR_ novamente e, abaixo, na seção _Changes requested_, navega até _requested changes_ e escolhe a opção _Re-request review_.
+
+A partir desse momento, ao acessar o _PR_, o revisor adiciona uma revisão novamente e verifica a(s) mudança(s). Então, se estiver tudo conforme o esperado, ele vai clicar no botão _Review changes_, escolher a opção _Approve_ e clicar em _Submit review_, habilitando, assim, o _merge_, a confirmação do _merge_ e a deleção do _branch_ _feature/k8s-driver-deployment_.
+
+Mas, caso não haja necessidade de solicitar mudanças, o revisor simplesmente clica em _Review changes_, escolhe a opção _Approve_ e clica novamente em _Submit review_, habilitando, então, o _merge_, a confirmação do _merge_ e a deleção do _branch_ _feature/k8s-driver-deployment_.
+
+### Protegendo branch para Code Review
+
+É possível melhorar a proteção dos _branches_ para se trabalhar com _PRs_.
+
+Vejamos um exemplo. O usuário _sidartaoss_ cria o _branch_ de uma nova funcionalidade e sobe para o _GitHub_:
+
+```
+git checkout -b feature/k8s-service
+
+git push origin feature/k8s-service
+```
+
+Então, o usuário _desafiofullcyclesidartaoss_ acessa o _branch_ recém criado, adiciona uma alteração no arquivo _k8s/driver/driver.yaml_, comita a alteração, escolhe um revisor e, finalmente, cria um novo _PR_.
+
+E, mesmo tendo solicitado a revisão, pode-se verificar que o botão _Merge pull request_ permanece habilitado para efetuar o _merge_.
+
+![Botão Merge pull request ainda habilitado](./images/botao-merge-pull-request-ainda-habilitado.png)
+
+Então, como proteger o _branch_ _develop_ para que isso não aconteça?
+
+Acessando _Settings / Branches / Branch protection rules_ e selecionando o _branch_ _develop_, é possível obrigar para que haja _code review_ para toda _PR_ antes de ser possível efetuar o _merge_. Para isso, deve-se selecionar a opção _Require a pull request before merging_. A partir dessa opção, é possível escolher também quantas pessoas devem revisar o código; neste caso, apenas uma.
+
+Ao clicar em _Save changes_ e voltar na _PR_, percebemos que, tanto o usuário _sidartaoss_ quanto o usuário _desafiofullcyclesidartaoss_ ficam bloqueados para efetuar o _merge_ enquanto não for realizado o _code review_:
+
+![Bloqueado para o merge](./images/bloqueado-para-o-merge.png)
+
+Assim, quando é feito, pelo menos, uma revisão por um usuário revisor, é liberado o _merge_ para o _branch develop_. Isso garante, então, que um _PR_ só será mergeado após uma ou mais revisões.
+
+### Trabalhando com CODEOWNERS
+
+Imaginemos o seguinte exemplo:
+
+- O usuário _desafiofullcyclesidartaoss_ é um especialista _frontend_ e o usuário _sidartaoss_ é um especialista _backend_. Em determinado momento, por algum motivo, o usuário _desafiofullcyclesidartaoss_ precisou alterar o código que foi criado pelo usuário _sidartaoss_. Não seria apropriado o usuário _sidartaoss_ revisar o _PR_ desse código, já que ele é especialista nesse tipo de código e foi ele quem o criou?
+
+É por conta disso que existe um recurso extremamente útil e que facilita o processo de _code review_ chamado de _CODEOWNERS_, onde é possível definir quem é o dono de certos tipos de códigos. Essa definição pode-se dar a partir de um diretório, uma extensão de arquivos ou até mesmo de um arquivo em específico.
+
+Então, a partir do momento que se atribui a propriedade de um tipo de código para alguém, aquela pessoa será responsável, automaticamente, por revisar aquele tipo de código.
+
+Assim, nós vamos criar um novo _branch_ para criar essa nova funcionalidade:
+
+```
+git checkout -b feature/codeowners
+
+touch .github/CODEOWNERS
+```
+
+Dentro desse arquivo de _CODEOWNERS_, nós vamos inserir o seguinte:
+
+```
+*.js @desafiofullcyclesidartaoss
+.github/ @imersaofullcyclesidartaoss
+*.go @sidartaoss
+*.html @desafiofullcyclesidartaoss
+```
+
+Dessa forma, o usuário _desafiofullcyclesidartaoss_ será o proprietário de todos os arquivos com extensão _\*.js_ e _\*.html_. O usuário _imersaofullcyclesidartaoss_ será o proprietário do diretório _.github/_ e o usuário _sidartaoss_ será o proprietário de todos os arquivos com extensão _\*.go_.
+
+Após subir essa nova funcionalidade para o _GitHub_, nós vamos setar mais uma configuração. Para isso, nós vamos em _Settings / Branches_, selecionar o _branch develop_ para edição e marcar a opção _Require review from Code Owners_. Isso vai habilitar a exigência de que um _code owner_ deve revisar o código.
+
+Para testar esse recurso, nós vamos criar um novo _branch_ para uma nova funcionalidade:
+
+```
+git checkout -b feature/refactor-folders
+
+mv .github/ driver/
+
+mv k8s/ driver/
+
+git status
+
+git add .
+
+git commit -m "refactor: move .github and k8s into driver folder"
+
+git push origin feature/refactor-folders
+```
+
+Note-se que, ao criar o _PR_, automaticamente, aparece o usuário _imersaofullcyclesidartaoss_ como _code owner_ para fazer a revisão do código, porque estamos mexendo no diretório _.github_, ao qual ele é o proprietário:
+
+![Usuário imersaofullcyclesidartaoss adicionado como code owner](./images/imersaofullcyclesidartaoss-adicionado-como-codeowner.png)
 
 ### Continuous Integration
 
-#### GitHub Actions
-
-Esses são alguns dos principais subprocessos envolvidos na execução do processo de CI e que são cobertos neste projeto:
+Esses são alguns dos principais subprocessos envolvidos na execução do processo de _CI_ e que são cobertos neste projeto:
 
 - Execução de testes;
 - _Linter_;
@@ -188,61 +438,724 @@ Algumas das ferramentas populares para a geração do processo de Integração C
 - _Google Cloud Build_;
 - _GitLab CI/CD_.
 
-A ferramenta que optou-se utilizar é o _GitHub_ _Actions_. Principalmente porque:
+#### GitHub Actions
 
-- É livre de cobrança para repositórios públicos;
-- É totalmente integrada ao GitHub.
+A ferramenta escolhida para este projeto é o _GitHub_ _Actions_. Principalmente porque:
 
-Estar integrado ao GitHub torna-se um diferencial, porque, baseado em eventos que acontecem no repositório, vários tipos de ações além de CI podem ser executadas.
+- É livre de cobrança (para repositórios públicos);
+- É totalmente integrada ao _GitHub_.
 
-Essas ações, geralmente, são desenvolvidas por outros desenvolvedores.
+Estar integrado ao _GitHub_ pode ser considerado um diferencial, porque, baseado em eventos que acontecem no repositório, vários tipos de ações (_Actions_) - além das relacionadas ao processo de _CI_ - podem ser executadas.
 
-Ao trabalhar com _GitHub_ _Actions_, sempre se inicia por um _workflow_.
+Sempre se inicia uma _GitHub Action_ a partir de um _workflow_.
+
+#### Workflow
 
 O _workflow_ consiste em um conjunto de processos definidos pelo desenvolvedor, sendo que é possível ter mais de um _workflow_ por repositório.
 
-O _workflow_:
+Um _workflow_:
 
 - É definido em arquivos _.yaml_ no diretório _.github/workflows_;
 - Possui um ou mais _jobs_ (que o _workflow_ roda);
-- É iniciado a partir de eventos do _GitHub_ ou através de agendamento.
+- É iniciado a partir de _eventos_ do _GitHub_ ou através de agendamento.
 
-Para cada evento, é possível definir:
+#### Eventos
 
-- Filtros;
-- Ambiente;
-- Ações.
+Para cada evento, é possível definir _filtros_, _ambiente_ e _ações_.
 
 Exemplo:
 
-- Evento:
-  on: push
-
+- **Evento**:
+  - _on: push_
 - Filtros:
-  branches:
-  master
-
+  - _branches_:
+    _master_
 - Ambiente:
-  runs-on: ubuntu
-
+  - _runs-on: ubuntu_
 - Ações:
-  steps:
-  - uses: action/run-composer
-  - run: npm run prod
+  - _steps_:
+    - _uses: action/run-composer_
+    - _run: npm run prod_
 
-Nesse exemplo, é disparado um evento de _on_ _push_, ou seja, alguém executou um _push_ no repositório.
+Nesse exemplo:
 
-O ambiente define a máquina em que o processo de _CI_ deve rodar, ou seja, em uma máquina _ubuntu_.
+- É disparado um _evento_ de _on_ _push_, no momento em que alguém executou um _push_ no repositório;
+- O _ambiente_ define a máquina em que o processo de _CI_ deve rodar; nesse caso, em uma máquina _ubuntu_;
+- O _filtro_ define que o evento deve acontecer somente quando for executado um _push_ para o _branch master_;
+- As _ações_ definem passos (_steps_), subdivididos em duas opções:
+  - _uses_ define uma _Action_ do _GitHub_, ou seja, um código desenvolvido por um desenvolvedor para ser executado no padrão do _GitHub Actions_. Inclusive, há um _marketplace_ do _GitHub Actions_ (`https://github.com/marketplace`);
+  - _run_ permite executar uma _Action_ ou um comando; nesse caso, é executado um comando dentro da máquina _ubuntu_.
 
-O filtro define que o evento deve acontecer somente quando for executado um _push_ para o _branch master_.
+### Criando primeiro workflow
 
-As ações definem alguns passos (_steps_), divididos em duas opções: _uses_ e _run_:
+Neste momento, vamos criar o nosso primeiro _workflow_ utilizando o _GitHub Actions_.
 
-- O _uses_ define uma _Action_ do _GitHub_, ou seja, um código desenvolvido por algum desenvolvedor para ser executado no padrão do _GitHub Actions_. Inclusive, há o _marketplace_ do _GitHub Actions_ (`https://github.com/marketplace`) com todas as _Actions_ disponíveis para uso.
+Primeiramente, vamos criar um novo _branch_ para uma nova funcionalidade e, em seguida, criamos um novo diretório _.github/workflows_ e um arquivo _ci.yaml_.
 
-- O _run_ permite executar uma _Action_ ou um comando. Neste caso, é executado um comando dentro da máquina _ubuntu_.
+```
+git checkout -b feature/primeiro-workflow
 
-#### Referência
+mkdir .github/workflows
+
+touch .github/workflows/ci.yaml
+```
+
+Dentro desse arquivo _ci.yaml_, faremos a definição do _workflow_.
+
+O _name_ do _workflow_ pode ser qualquer nome. Neste caso, chamamos de _ci-driver_.
+
+```
+name: ci-driver
+```
+
+No evento de _on push_, ou seja, toda vez que alguém fizer um _push_ diretamente para esse repositório, esse processo de _CI_ vai rodar.
+
+```
+name: ci-driver
+on: [push]
+```
+
+Na seqüência, nós definimos quais são os _jobs_ que queremos executar. O primeiro _job_ que vamos trabalhar será o _check-application_:
+
+```
+name: ci-driver
+on: [push]
+jobs:
+  check-application:
+```
+
+Depois, definimos aonde queremos rodar essa aplicação. Neste caso, será em uma imagem da última versão do _ubuntu_.
+
+```
+name: ci-driver
+on: [push]
+jobs:
+  check-application:
+    runs-on: ubuntu-latest
+```
+
+Após isso, definimos quais são os passos que queremos executar no momento em que esse processo começar a ser executado. O primeiro _step_ é o _actions/checkout@v3_.
+
+> Lembrando que _actions_ refere-se ao usuário e _checkout_ refere-se ao repositório do _GitHub_: `https://github.com/actions/checkout`.
+
+O que o _actions/checkout@v3_ faz é pegar os arquivos do repositório do _GitHub_ e baixar na máquina _ubuntu_.
+
+```
+name: ci-driver
+on: [push]
+jobs:
+  check-application:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+```
+
+Outra _action_ que vamos utilizar é a _actions/setup-go@v4_, responsável por preparar o ambiente _go_.
+
+```
+name: ci-driver
+on: [push]
+jobs:
+  check-application:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+```
+
+Após preparar o ambiente, é possível escolher a versão do _go_ que queremos utilizar.
+
+```
+name: ci-driver
+on: [push]
+jobs:
+  check-application:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '>=1.18'
+```
+
+E, por fim, vamos rodar um comando para testar e para fazer o _build_ da aplicação.
+
+```
+name: ci-driver
+on: [push]
+jobs:
+  check-application:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '>=1.18'
+      - run: go test ./...
+      - run: go build driver.go
+```
+
+Porém, antes de comitar as alterações, vamos criar uma classe de testes: _driver_test.go_
+
+```
+touch driver_test.go
+
+vim driver_test.go
+
+package main
+
+import "testing"
+
+func TestLoadDrivers(t *testing.T) {
+	// arrange
+	// act
+	actual := loadDrivers()
+	// assert
+	if actual == nil {
+		t.Error("Expected drivers but got nil")
+	}
+}
+
+```
+
+E, neste momento, vamos subir para o _GitHub_:
+
+```
+git add .
+
+git commit -m "ci: add github actions"
+
+git push origin feature/primeiro-workflow
+```
+
+Ao acessar na aba _Actions_, verificamos que o _workflow_ _ci-driver_ rodou com sucesso.
+
+![Workflow ci-driver rodou com sucesso](./images/workflow-ci-driver-rodou-com-sucesso.png)
+
+Na parte inferior do _PR_, é possível ver, também, que todas as verificações passaram (_All checks have passed_):
+
+![Todas as verificações passaram](./images/todas-as-verificacoes-passaram.png)
+
+### Ativando status check
+
+Voltando às boas práticas de proteção dos _branches_, vamos adicionar mais uma regra de proteção para o _branch develop_: nós vamos exigir que um _status check_ passe antes de realizar o _merge_: _Require status checks to pass before merging_.
+
+Neste caso, nós vamos informar, como _status check_, o _check-application_. O _check-application_ refere-se ao _job_ que nós configuramos no arquivo _ci.yaml_.
+
+![Status check ckeck-application](./images/status-check-check-application.png)
+
+E, da mesma forma que configuramos para o _branch_ _develop_, configuramos para o _branch master_.
+
+#### Separando os processos
+
+O processo de _CI_, que vai rodar para o _branch_ _develop_, vai ser diferente do processo de _CD_, que vai rodar para o _branch_ _master_.
+
+Normalmente, o processo de _CI_ só vai verificar se está tudo passando, enquanto que o processo de _CD_, além de fazer essa verificação, vai, também, fazer o _deploy_.
+
+Nesse sentido, nós vamos adicionar uma restrição no nosso _workflow_ para que o processo de _CI_ aconteça apenas para o _branch develop_, porque as regras para o ambiente de Produção vão ser diferentes.
+
+```
+name: ci-driver
+on:
+  pull_request:
+    branches:
+      - develop
+jobs:
+  check-application:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ">=1.18"
+      - run: go test ./...
+      - run: go build driver.go
+```
+
+### Preparando ambiente para o SonarCloud
+
+O nosso objetivo, neste momento, é integrar um serviço gerenciado do _Sonarqube_ - o _SonarCloud_ - ao processo de Integração Contínua.
+
+Basicamente, o que iremos fazer é integrar ao _GitHub Actions_ o _quality gate_ do _SonarCloud_.
+
+Então, inicialmente, vamos criar um novo _branch_ para adicionar essa nova funcionalidade:
+
+```
+git checkout -b feature/sonar-cloud
+```
+
+A primeira alteração que faremos no nosso _workflow_ é para permitir trabalharmos com cobertura de código a partir do _SonarCloud_.
+
+Para isso, vamos alterar o comando de teste do _go_ para inserir o resultado dos testes em um arquivo chamado _coverage.out_:
+
+```
+name: ci-driver
+on:
+  pull_request:
+    branches:
+      - develop
+jobs:
+  check-application:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ">=1.18"
+      - run: go test -coverprofile=coverage.out
+```
+
+Em seguida, vamos adicionar um arquivo de configuração à raiz do projeto: _sonar-project.properties_:
+
+```
+touch sonar-project.properties
+
+vim sonar-project.properties
+
+sonar.projectKey=
+sonar.organization=
+
+sonar.sources=.
+sonar.exclusions=**/*_test.go
+
+sonar.tests=.
+sonar.test.inclusions=**/*_test.go
+sonar.go.coverage.reportPaths=coverage.out
+```
+
+- A propriedade _sonar.sources_ define aonde está o código-fonte.
+- A propriedade _sonar.exclusions_ define quais arquivos devem ser excluídos da cobertura de código.
+- A propriedade _sonar.tests_ define aonde estão os arquivos de testes.
+- A propriedade _sonar.test.inclusions_ define quais são os arquivos de testes.
+- A propriedade _sonar.go.coverage.reportPaths_ define qual é o arquivo de _coverage_.
+
+E vamos subir essas alterações para o _GitHub_.
+
+```
+git add .
+
+git commit -m "ci: add sonar cloud"
+
+git push origin feature/sonar-cloud
+```
+
+### SonarCloud
+
+> Lembrando que o _SonarCloud_ é uma ferramenta paga, mas, para repositórios públicos, ele é gratuito.
+
+- Ao acessar `https://sonarcloud.io`, realiza-se o login pela conta do _GitHub_.
+- No menu superior, deve-se ir em _Analize new project_.
+- Em seguida, seleciona-se a organização, que, neste caso, é _maratonafullcyclesidartaoss_ e o repositório que, neste caso, é _
+  fullcycle-maratona-1-codelivery-part-5-driver_. Por fim, clicar em _Set Up_.
+- Em _Choose your Analisys Method_, deve-se selecionar _With GitHub Actions_.
+- Na tela seguinte, _Analyze a project with a GitHub Action_, o _SonarCloud_ informa que será necessário criar um novo _secret_ chamado _SONAR_TOKEN_ no repositório do _GitHub_.
+- Na parte inferior da tela _Analyze a project with a GitHub Action_, o _SonarCloud_ pergunta qual é a linguagem de programação do projeto. Ao selecionar _Other_, ele apresenta um _template_ para executar o _Scan_ do _SonarCloud_, ao qual adicionamos em _ci.yaml_:
+
+```
+name: ci-driver
+on:
+  pull_request:
+    branches:
+      - develop
+jobs:
+  check-application:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ">=1.18"
+      - run: go test -coverprofile=coverage.out
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+```
+
+E o _SonarCloud_ apresenta também as propriedades a serem adicionadas no arquivo _sonar-project.properties_:
+
+```
+sonar.projectKey=maratonafullcyclesidartaoss_fullcycle-maratona-1-codelivery-part-5-driver
+sonar.organization=maratonafullcyclesidartaoss
+```
+
+Com isso, podemos subir as alterações para o _GitHub_.
+
+```
+git add .
+
+git commit -m "ci: add sonar cloud properties"
+
+git push orign feature/sonar-cloud
+```
+
+E, ao subir para o _GitHub_, percebemos que o _Quality Gate_ do _SonarCloud_ falhou:
+
+![Quality Gate do SonarCloud falhou](./images/sonar-cloud-quality-gate-failed.png)
+
+Ao clicar no link _Details_ de _SonarCloud Code Analysis_:
+
+![Análise de Código do SonarCloud](./images/sonar-cloud-code-analysis.png)
+
+- A cobertura de código está abaixo do esperado (80%);
+- Há 3 problemas de segurança;
+- E há 1 _code smell_.
+
+Em relação à cobertura de código:
+
+- Clicamos no _link_ de _24.0% Coverage_;
+- Abaixo, no menu esquerdo, vamos em _Administration / Quality Gate_ / Organization's settings e selecionamos ou criamos um novo _Quality Gate_. Neste caso, vamos selecionar _Maratona Quality Gate_;
+- Na métrica de _Coverage_, vamos setar um novo valor de 20%;
+
+Em relação aos problemas de segurança, eles foram identificados no _Dockerfile_ e no _Dockerfile.prod_:
+
+- _Copying recursively might inadvertently add sensitive data to the container. Make sure it is safe here._
+- _The golang image runs with root as the default user. Make sure it is safe here._
+
+Em relação ao _code smell_, ele foi identificado no _Dockerfile.prod_:
+
+- _Replace `as` with upper case format `AS`_.
+
+Não devemos esquecer também de ir em _Settings / Branches / Branch protection rules / Edit develop_ e adicionar _SonarCloud Code Analysis_ na opção de _Require status checks to pass before merging_ e marcar a opção de _Do not allow bypassing the above settings_:
+
+![Required statuses must pass before merging](./images/required-statuses-must-pass-before-merging.png)
+
+### Documentação da API
+
+Antes de iniciarmos com a parte de _APIOps_, vamos produzir a documentação da _API_, pois a metodologia de _APIOps_ visa, também, validar informações obrigatórias na documentação da _API_.
+
+Vamos utilizar a ferramenta _[swag](https://github.com/swaggo/swag)_ do _Go_. A partir do comando `swag init`, é gerado um diretório _docs_ contendo um arquivo _swagger.yaml_ no formato da especificação _OpenAPI_.
+
+A geração da documentação é baseada na adição de comentários em um formato declarativo no código-fonte da _API_. Por exemplo:
+
+```
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+func main() {
+}
+```
+
+Ao aplicar as alterações sugeridas pela ferramenta, temos a versão inicial da documentação para a _API Driver_:
+
+![Maratona Full Cycle Driver API](./images/maratona-fullcycle-driver-api.png)
+
+### APIOps
+
+O nosso objetivo, agora, é automatizar o processo de validação da _API_. Para isso, vamos utilizar os princípios de _APIOps_.
+
+Conforme documentação da _[Microsoft](https://learn.microsoft.com/pt-br/azure/architecture/example-scenario/devops/automated-api-deployments-apiops)_:
+
+> A APIOps é uma metodologia que aplica os conceitos de GitOps e DevOps à implantação da API. Assim como o DevOps, o APIOps ajuda os membros da equipe a fazer alterações e implantá-las de maneira iterativa e automatizada.
+
+Sendo assim, qual(is) problema(s) a _APIOps_ resolve?
+
+Vejamos um exemplo de processo tradicional de _deployment_ de _APIs_.
+
+No processo tradicional de _deployment_ de _APIs_, cada uma das equipes na empresa tem as suas práticas de _APIs_ e, em geral, existe um time de _APIs_ dentro da empresa. Então, as outras equipes solicitam para esse time de _APIs_ a revisão do contrato delas, ou seja, das _APIs_ que elas estão produzindo.
+
+O time de _APIs_ vai fazer, então, a validação: verificar se o contrato está seguindo o que eles consideram como boas práticas, se há testes, etc. Se tudo estiver em conformidade com o padrão esperado, o time de _APIs_ realiza o _deployment_ para a plataforma de _APIs_.
+
+Nesse cenário, percebe-se que alguns problemas podem acontecer:
+
+- Conforme o número de equipes for crescendo, o time de _APIs_, obrigatoriamente, precisa ir crescendo também para não se tornar um _gargalo_ no processo, pois ele precisa validar as _APIs_ de todas as equipes da empresa.
+- Além disso, o processo de validação pode ser um trabalho repetitivo e manual, o que tende a ser prejudicial para a estabilidade e a conformidade com os padrões, pois abre a possibilidade de revisões serem feitas de maneira incorreta.
+
+Já no cenário de _deployment_ da _APIOps_, são projetadas algumas estruturas de forma automatizada, principalmente, com o objetivo de remover esse _gargalo_ no processo de revisão. A principal diferença é que o processo é automatizado, utilizando-se ferramentas para isso.
+
+Dessa forma, é repassada ao time de _APIs_ a responsabilidade de fornecer as ferramentas e os processos para que a revisão e a entrega da _API_ em produção aconteçam de forma automatizada. Assim, no processo de _APIOps_, busca-se:
+
+- Atender aos requisitos da empresa, no que tange à _API_, para estar em conformidade com o padrão de contrato;
+- Verificar se a _API_ contém informações obrigatórias;
+- Garantir que a _API_, no formato _OpenAPI_, esteja em um padrão único definido pela empresa para todas as _APIs_.
+
+A _APIOps_ visa, por fim, aumentar a qualidade da _API_, para que seja produzida de uma maneira uniforme, aplicando um padrão de contrato, de forma que os clientes não tenham uma experiência ruim ao integrar com a _API_ que está sendo disponibilizada.
+
+### Ferramentas Necessárias
+
+Vejamos algumas ferramentas para implementar os fluxos de _APIOps_.
+
+#### GitHub Actions
+
+A idéia é que o _GitHub Actions_ é capaz de prover o mecanismo para disparar um fluxo de determinadas ações que, neste caso, envolvem a validação do contrato.
+
+Basicamente, o que iremos fazer é adicionar um novo _job_ de validação ao nosso _workflow_:
+
+```
+jobs:
+  validate:
+    name: Validate OpenAPI documentation
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the repository
+      - uses: actions/checkout@v2
+
+      # Run Spectral
+      - uses: stoplightio/spectral-action@latest
+        with:
+          file_glob: "docs/swagger.yaml"
+          spectral_ruleset: "docs/openapi.spectral.yaml"
+```
+
+#### Spectral
+
+O _Spectral_ é uma ferramenta da empresa _Spotlight (https://stoplight.io/open-source/spectral)_.
+
+O objetivo dessa ferramenta é validar determinados arquivos como, por exemplo, o arquivo _OpenAPI_ que descreve o nosso contrato (_swagger.yaml_). Assim, o _Spectral_ é capaz de aplicar _linters_, ou seja, ele identifica algumas características que ele valida baseado em níveis de severidade.
+
+Uma das principais vantagens em utilizar essa ferramenta é que ela já traz algumas validações prontas relacionadas a _OpenAPI_, simplificando o nosso trabalho, porque vai evitar que tenhamos que escrever mais arquivos _.yaml_.
+
+Dessa forma, o _Spectral_ será utilizado para aplicar a validação do contrato, garantindo a conformidade do padrão para a _API_ _Driver_.
+
+Para isso, criamos um arquivo chamado _openapi.spectral.yaml_ no diretório _docs_ que define um conjunto de regras (_Ruleset_). O arquivo que descreve a _API_ deve conter, por exemplo:
+
+- Informações de contato;
+- Nome, URL e e-mail do contato;
+- Um sumário e uma descrição para cada operação de _GET, POST, PUT, DELETE, OPTIONS_.
+
+Ao subir as alterações para o _GitHub_, verificamos que a validação da documentação _OpenAPI_ passou:
+
+![Validação da documentação OpenAPI passou](./images/validacao-documentacao-openapi-passou.png)
+
+No entanto, se, por exemplo, removemos a descrição da operação _GET_ (_ListDrivers_) no arquivo _swagger.yaml_, a validação não passa:
+
+![Validação da documentação OpenAPI não passou](./images/validacao-documentacao-openapi-nao-passou.png)
+
+Por fim, não devemos esquecer de ajustar as configurações em _Settings / Branches / Branch protection rules/ Edit develop_ e adicionar na opção de _Require status checks to pass before merging_ o _status check_ de _Validate OpenAPI documentation_.
+
+### Terraform
+
+Antes de iniciarmos o processo de _Continuous Delivery_, precisamos criar um _cluster_ _Kubernetes_. Neste projeto, iremos trabalhar com o _Google Kubernetes Engine_ (_GKE)_.
+
+Mas, desta vez, não iremos criar a partir do painel do _Google Cloud Platform (GCP)_; iremos provisionar via _Infrastructure As Code_ (_IaC_), utilizando o _Terraform_.
+
+<Texto Introdução Terraform>
+
+Seguindo o tutorial do _Terraform_ para provisionar um _cluster GKE_:
+
+- Um dos pré-requisitos é termos o _gcloud_ instalado na máquina local;
+- Vamos rodar o comando: `gcloud init` para setar o `gcloud` com algumas configurações padrões, como projeto, zona e região;
+
+![Gcloud inicializar configurações](./images/gcloud-inicializar-configuracoes.png)
+
+Em seguida, vamos rodar o comando: `gcloud auth application-default login` para autenticar com a _CLI gcloud_. Isso permitirá que o _Terraform_ acesse as credenciais para provisionar recursos na _Google Cloud_.
+
+Na seqüência, vamos clonar uma configuração de exemplo para a pasta _/terraform_:
+
+```
+mkdir terraform
+cd terraform/
+
+git clone https://github.com/hashicorp/learn-terraform-provision-gke-cluster
+```
+
+Devemos atualizar o arquivo _terraform.tfvars_ com _project_id_ e _region_:
+
+```
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
+project_id = "maratona-fullcycle-388513"
+region     = "us-central1"
+```
+
+Vamos alterar também o arquivo _gke.tf_ em _gke_num_nodes_ de 2 para 1. Isso porque um _pool_ de nós será provisionado em cada uma das três zonas da região para fornecer alta disponibilidade, totalizando 3 nós no _cluster_.
+
+```
+variable "gke_num_nodes" {
+  default     = 1
+  description = "number of gke nodes"
+}
+```
+
+Neste momento, podemos inicializar o _workspace_ do _Terraform_, que irá baixar e inicializar o provedor do _Google Cloud_ com os valores informados em _terraform.tfvars_:
+
+```
+terraform init
+```
+
+Depois, dentro do diretório inicializado, rodamos o comando `terraform apply` e revisamos as ações planejadas. A saída no _terminal_ indicará que o plano está em execução e quais os recursos que serão criados: uma _VPC_, uma _subnet_, o _cluster GKE_ e um _pool_ de nós do _GKE_.
+
+![Plano do Terraform para criar cluster GKE](./images/plano-terraform-criar-cluster-gke.png)
+
+Após confirmar, o processo de provisionamento pode durar cerca de 10 minutos. Ao final, o _terminal_ irá mostrar os valores definidos para o nome e o _host_ do _cluster_ _GKE_:
+
+![Valores definidos para o nome e o host do cluster GKE](./images/nome-e-host-do-cluster-gke.png)
+
+Por fim, devemos rodar um comando para configurar o _kubectl_ com credenciais de acesso:
+
+```
+gcloud container clusters get-credentials $(terraform output -raw kubernetes_cluster_name) --region $(terraform output -raw region)
+```
+
+E, para confirmar a criação dos nós, é só rodar:
+
+```
+kubectl get nodes
+
+NAME                                                  STATUS   ROLES    AGE     VERSION
+gke-maratona-fullcyc-maratona-fullcyc-12d4c0b5-2j7d   Ready    <none>   4m49s   v1.25.8-gke.500
+gke-maratona-fullcyc-maratona-fullcyc-7a340d65-wkbg   Ready    <none>   4m51s   v1.25.8-gke.500
+gke-maratona-fullcyc-maratona-fullcyc-f97e39ff-dvzw   Ready    <none>   4m51s   v1.25.8-gke.500
+
+```
+
+### GitOps
+
+E, agora que provisonamos um _cluster_ _Kubernetes_, podemos iniciar o processo de _Continuous Delivery_, seguindo o modelo de _GitOps_.
+
+<Introdução GitOps>
+
+#### Criando imagem Docker
+
+Neste momento, vamos refatorar o arquivo _Dockerfile_, porque ele será utilizado no processo de _GitOps_.
+
+Então, vamos remover o arquivo _Dockerfile.prod_ e substituir o conteúdo no arquivo _Dockerfile_ por:
+
+```
+FROM golang:1.19 AS build
+
+WORKDIR /app
+
+COPY . .
+
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build driver.go
+
+FROM scratch
+WORKDIR /app
+COPY --from=build /app/driver  /app/.env /app/drivers.json ./
+
+ENTRYPOINT [ "./driver" ]
+```
+
+Em seguida, para testar o _Dockerfile_, vamos criar uma imagem.
+
+```
+docker build -t sidartasilva/fullcycle-maratona-1-codelivery-part-5-driver .
+```
+
+Vamos verificar, também, se está tudo funcionando a partir do _container_:
+
+```
+docker run --rm -p 8081:8081 sidartasilva/fullcycle-maratona-1-codelivery-part-5-driver
+
+2023/06/02 18:20:58 alive
+```
+
+E, por fim, vamos subir essa imagem para o _DockerHub_:
+
+```
+docker push sidartasilva/fullcycle-maratona-1-codelivery-part-5-driver
+```
+
+#### Criando fluxo de geração da imagem
+
+A idéia, neste momento, é criar um _pipeline_ de _CI_ para baixar o projeto , fazer o _build_ e subir a imagem no _DockerHub_. E, para criar o _pipeline_, iremos utilizar o _GitHub Actions_.
+
+O _workflow_ será disparado toda vez que for feito um _PR_ para o _branch_ _master_. Como estamos utilizando a metologia de _GitFlow_, isso irá acontecer toda vez que for gerada uma nova _release_.
+
+```
+name: cd-driver
+on:
+  pull_request:
+    branches:
+      - master
+```
+
+O _job_ irá executar uma tarefa chamada de _Build_ a partir de uma máquina _ubuntu_ que o _GitHub Actions_ irá preparar:
+
+```
+name: cd-driver
+on:
+  pull_request:
+    branches:
+      - master
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+```
+
+O nosso primeiro passo será o de _checkout_ do código, ou seja, obter o código que está no repositório e baixar para a máquina _ubuntu_:
+
+```
+name: cd-driver
+on:
+  pull_request:
+    branches:
+      - master
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+```
+
+Agora que o _GitHub Actions_ baixou o código, nós vamos fazer o _build_ da imagem e subir para o _DockerHub_.
+
+```
+name: cd-driver
+on:
+  pull_request:
+    branches:
+      - master
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build and push image to DockerHub
+        uses: docker/build-push-action@v1.1.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ${{ secrets.DOCKER_USERNAME }}/fullcycle-maratona-1-codelivery-part-5-driver
+          tags: ${{ github.sha }}, latest
+```
+
+O _sha_ refere-se ao código _hash_ que é gerado a partir do _commit_ e será utilizada como _tag_ para o controle de versões da imagem.
+
+Neste momento, iremos subir as alterações para o _GitHub_:
+
+```
+git add .
+
+git commit -m "ci: add build"
+
+git push origin feature/gitops
+```
+
+E, na seqüência, iremos gerar uma _release_:
+
+```
+git checkout -b release/v1.0.0
+
+git push origin release/v1.0.0
+```
+
+#### Referências
 
 FULL CYCLE 3.0. Integração contínua. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 26 mai. 2023.
+
 FULL CYCLE 3.0. Padrões e técnicas avançadas com Git e Github. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 26 mai. 2023.
+
+FULL CYCLE 3.0. API Gateway com Kong e Kubernetes. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 31 mai. 2023.
+
+SPECTRAL. Create a Ruleset. 2023. Disponível em: <https://meta.stoplight.io/docs/spectral/01baf06bdd05a-create-a-ruleset>. Acesso em: 01 jun. 2023.
+
+TERRAFORM. Provision a GKE Cluster (Google Cloud). 2023. Disponível em: <https://developer.hashicorp.com/terraform/tutorials/kubernetes/gke>. Acesso em: 01 jun. 2023.
+
+FULL CYCLE 3.0. GitOps. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 02 jun. 2023.

@@ -1371,6 +1371,100 @@ git push -u origin v1.1.0
 
 O nosso objetivo, agora, é, simplesmente, trabalhar com o agente, ou seja, a ferramenta _ArgoCD_ para acessar o repositório do _GitHub_ e atualizar a aplicação no _cluster Kubernetes_ com a última versão desse repositório.
 
+#### ArgoCD
+
+O _ArgoCD_ é uma ferramenta que vai ficar lendo o repositório no _GitHub_ e, se houver alguma mudança, ele vai mostrar para fazer a sincronização no _cluster Kubernetes_.
+
+Como instalar?
+
+Para instalar, basicamente, basta seguir os passos definidos na página de documentação do _ArgoCD_ (https://argo-cd.readthedocs.io/en/stable/getting_started/):
+
+```
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+```
+
+Ou seja, cria-se um novo _namespace_ e aplica-se o manifesto de instalação diretamente no _cluster Kubernetes_.
+
+Ao rodar o comando `kubectl get all -n argocd`, podemos visualizar todos os objetos que foram criados no _namespace_ _argocd_:
+
+![Objetos criados no namespace argocd](./images/objetos-criados-ns-argocd.png)
+
+Como fazer o login no _ArgoCD_?
+
+Novamente, conforme a documentação, basta executar o seguinte comando para obter-se uma senha:
+
+```
+argocd admin initial-password -n argocd
+```
+
+Agora, para rodar o _ArgoCD_, basta executar um comando de _port forwarding_:
+
+```
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+```
+
+E, para acessar, basta digitar `localhost:8080` no navegador e logar com o _username admin_ e a senha obtida anteriormente:
+
+![Logar ArgoCD com username admin](./images/logar-argocd-com-admin.png)
+
+#### Fazendo deploy com ArgoCD
+
+O nosso objetivo, agora, é fazer o deploy da aplicação e fazer também com que o _ArgoCD_ torne-se o agente no processo de _GitOps_, ou seja, ele permanece lendo o repositório no _GitHub_ e, toda vez que houver uma mudança no repositório, ele vai aplicar no _cluster Kubernetes_ também.
+
+Como criar uma nova aplicação no _ArgoCD_?
+
+Isso pode ser feito de duas maneiras: via _IaC_ através de um manifesto ou via painel do _ArgoCD_. Neste caso, iremos criar via painel do _ArgoCD_.
+
+Então, clicamos no botão _New App_ e é aberto um novo formulário:
+
+- Em _Application name_, preenchemos com: _driver_;
+- Em Project name, selecionamos _default_, porque se refere ao próprio _cluster Kubernetes_;
+- Em SYNC POLICY, vamos deixar como _Manual_, o que significa que o _ArgoCD_ não irá sincronizar automaticamente o _cluster_ a cada alteração do repositório no _GitHub_; será de responsabilidade do desenvolvedor sincronizar manualmente.
+- Em SOURCE, preenche-se com o repositório do _GitHub_: _https://github.com/maratonafullcyclesidartaoss/fullcycle-maratona-1-codelivery-part-5-driver_;
+- Em Path, selecionamos _k8s_, que o _ArgoCD_ já reconheceu como um diretório contendo manifesto do _Kubernetes_;
+- Em DESTINATION/Cluster URL, selecionamos o nosso próprio _cluster_, ou seja, _https://kubernetes.default.svc_;
+- Em Namespace, preenchemos com _default_;
+
+![Formulário de cadastro da aplicação do ArgoCD](./images/cadastro-aplicacao-argocd.png)
+
+Agora, basta clicar em _Create_:
+
+![Aplicação driver criada no ArgoCD](./images/aplicacao-driver-criada-argocd.png)
+
+Vemos que o _ArgoCD_ está nos indicando que a aplicação está _OutOfSync_, ou seja, o que está no repositório no _GitHub_ é diferente do que está no _cluster Kubernetes_.
+
+Agora, vamos entrar na aplicação:
+
+![Entrando na aplicação driver no ArgoCD](./images/entrando-na-aplicacao-driver-argocd.png)
+
+O _ArgoCD_ está nos informando que tanto o objeto de _Deployment_ quanto _Service_ estão faltando (_missing_) no _cluster Kubernetes_.
+
+Então, para sincronizar, nós podemos clicar em _SYNC/SYNCHRONIZE_ e, automaticamente, é baixada a imagem com base nos manifestos do repositório no _GitHub_ e os objetos são criados no _cluster Kubernetes_: _Deployment_, _ReplicaSet_, _Service_, _POD_:
+
+![ArgoCD sincronizado e objetos criados no cluster](./images/argocd-sincronizado-objetos-criados.png)
+
+Agora, para testar se o serviço está no ar, obtemos o _IP_ externo e fazemos um _curl_ para _/drivers_:
+
+```
+kubectl get svc
+
+NAME             TYPE           CLUSTER-IP    EXTERNAL-IP     PORT(S)        AGE
+driver-service   LoadBalancer   10.7.241.70   34.173.227.93   80:31139/TCP   9m44s
+kubernetes       ClusterIP      10.7.240.1    <none>          443/TCP        9h
+
+curl 34.173.227.93/drivers
+{"Drivers":[{"uuid":"45688cd6-7a27-4a7b-89c5-a9b604eefe2f","name":"Wesley W"},{"uuid":"9a118e4d-821a-44c7-accc-fa99ac4be01a","name":"Luiz"}]}
+```
+
+Neste momento, vamos gerar mais uma _release_ para ver o comportamento do _ArgoCD_:
+
+```
+git checkout -b release/v1.1.1
+
+git push origin release/v1.1.1
+```
+
 #### Referências
 
 FULL CYCLE 3.0. Integração contínua. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 26 mai. 2023.
@@ -1384,3 +1478,5 @@ SPECTRAL. Create a Ruleset. 2023. Disponível em: <https://meta.stoplight.io/doc
 TERRAFORM. Provision a GKE Cluster (Google Cloud). 2023. Disponível em: <https://developer.hashicorp.com/terraform/tutorials/kubernetes/gke>. Acesso em: 01 jun. 2023.
 
 FULL CYCLE 3.0. GitOps. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 02 jun. 2023.
+
+ARGO CD. Getting Started. 2023. Disponível em: <https://argo-cd.readthedocs.io/en/stable/getting_started/>. Acesso em: 02 jun. 2023.

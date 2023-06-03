@@ -1343,6 +1343,34 @@ jobs:
           repository: maratonafullcyclesidartaoss/fullcycle-maratona-1-codelivery-part-5-driver
 ```
 
+E, para verificar se está tudo funcionando, vamos gerar uma nova _release_:
+
+```
+git checkout -b release/v1.1.0
+
+git push origin release/v1.1.0
+```
+
+> Antes de criar o _PR_ para o _branch_ _master_, pode ser necessário alterar, nas configurações do _GitHub_, o _branch_ padrão de _develop_ para _master_.
+
+Após fazer o _merge_ no _branch master_, verificamos que o último histórico que tivemos foi a _GitHub Actions_ dando um _Bump docker version_ e, se acessarmos o arquivo _k8s/kustomization.yaml_, vemos que a propriedade _newTag_ está com uma nova versão (i.e., _b5acebca98636c6fee8518a4198f1e27a81fcf34_):
+
+![Arquivo kustomization.yaml e Bump Docker version](./images/kustomization-bump-docker-version.png)
+
+E, se verificarmos no _DockerHub_, vemos que foi adicionada uma nova imagem com a mesma _tag b5acebca98636c6fee8518a4198f1e27a81fcf34_.
+
+![Adicionada imagem com tag do último commit](./images/adicionada-imagem-com-tag-ultimo-commit.png)
+
+Por final, criamos uma nova _tag_ da _release/v1.1.0_:
+
+```
+git tag -a v1.1.0 -m "version 1.1.0"
+
+git push -u origin v1.1.0
+```
+
+O nosso objetivo, agora, é, simplesmente, trabalhar com o agente, ou seja, a ferramenta _ArgoCD_ para acessar o repositório do _GitHub_ e atualizar a aplicação no _cluster Kubernetes_ com a última versão desse repositório.
+
 #### Referências
 
 FULL CYCLE 3.0. Integração contínua. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 26 mai. 2023.

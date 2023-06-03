@@ -1440,7 +1440,7 @@ Agora, vamos entrar na aplicação:
 
 O _ArgoCD_ está nos informando que tanto o objeto de _Deployment_ quanto _Service_ estão faltando (_missing_) no _cluster Kubernetes_.
 
-Então, para sincronizar, nós podemos clicar em _SYNC/SYNCHRONIZE_ e, automaticamente, é baixada a imagem com base nos manifestos do repositório no _GitHub_ e os objetos são criados no _cluster Kubernetes_: _Deployment_, _ReplicaSet_, _Service_, _POD_:
+Então, para sincronizar, nós podemos clicar em _SYNC/SYNCHRONIZE_ e, automaticamente, é feita a sincronização com o cluster Kubernetes: baixa-se a imagem com base nos manifestos no repositório do _GitHub_ e os são criados os objetos de _Deployment_, _ReplicaSet_, _Service_ e _POD_:
 
 ![ArgoCD sincronizado e objetos criados no cluster](./images/argocd-sincronizado-objetos-criados.png)
 
@@ -1464,6 +1464,45 @@ git checkout -b release/v1.1.1
 
 git push origin release/v1.1.1
 ```
+
+Ao criar um novo _PR_, podemos ver que rodou o processo de _CD_ e foi alterado o arquivo do _Kustomize_ com a linha da nova versão:
+
+![Arquivo kustomization.yaml alterado novamente com newTag](./images/newtag-kustomization-alterada-novamente.png)
+
+Podemos verificar, também, que foi criada uma imagem com a nova _tag_ no _DockerHub_:
+
+![Gerada nova tag no DockerHub](./images/gerada-nova-tag-dockerhub.png)
+
+Em suma, o fluxo de _CD_ é responsável por apenas subir uma imagem para o _DockerHub_ e alterar uma linha no arquivo do _Kustomize_; não existe nenhuma relação direta com o _cluster Kubernetes_ no processo de _CD_.
+
+E, neste momento, vamos verificar o _ArgoCD_:
+
+![Verificando ArgoCD novamente](./images/verificando-argocd-novamente.png)
+
+De tempos em tempos, o _ArgoCD_ acessa o repositório no _GitHub_ para verificar se houve alguma alteração e podemos ver que a aplicação está _OutOfSync_. O que nós podemos fazer é clicar em _SYNC_ e _SYNCHRONIZE_ e, em seguida, o _ArgoCD_ sincroniza com o _cluster Kubernets_ e um novo _POD_ é criado.
+
+![ArgoCD sincroniza e novo POD é criado](./images/argocd-sincroniza-novo-pod-criado.png)
+
+E, se testarmos novamente, o serviço continua respondendo:
+
+```
+curl 34.173.227.93/drivers
+{"Drivers":[{"uuid":"45688cd6-7a27-4a7b-89c5-a9b604eefe2f","name":"Wesley W"},{"uuid":"9a118e4d-821a-44c7-accc-fa99ac4be01a","name":"Luiz"}]}
+```
+
+### Destruindo a infraestrutura
+
+Chegou o momento de liberar os recursos no ambiente _cloud_.
+
+Para tanto, iremos utilizar o _Terraform_, que irá remover todos os recursos relacionados com o _cluster GKE_.
+
+```
+cd terraform/
+
+terraform destroy
+```
+
+![Cluster GKE destruído](./images/cluster-gke-destruido.png)
 
 #### Referências
 

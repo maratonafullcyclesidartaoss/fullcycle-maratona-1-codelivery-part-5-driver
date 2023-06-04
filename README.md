@@ -60,13 +60,12 @@ Nesta quinta versão, trabalhamos com tecnologias relacionadas aos processos de 
 O objetivo deste projeto é cobrir um processo simples de desenvolvimento do início ao fim, desde:
 
 - A utilização de uma metodologia para se trabalhar com o _Git_ - o _GitFlow_;
-- A adoção de _Conventional Commits_ como especificação para as mensagens de _commits_;
-- A adoção de _Semantical Versioning (SemVer)_ como convenção para o versionamento de versões da aplicação;
+- A adoção de _Conventional Commits_ para as mensagens de _commits_ e de _Semantical Versioning (SemVer)_ para o versionamento de _releases_ da aplicação;
 
 Até a definição de:
 
-- Um _pipelines_ de Integração Contínua;
-- Um _pipelines_ de Entrega Contínua;
+- Um _pipelines_ de Integração Contínua (_CI_);
+- Um _pipelines_ de Entrega Contínua (_CD_);
 
 Realizando, por fim:
 
@@ -1557,11 +1556,13 @@ terraform destroy
 
 #### Referências
 
+UDEMY. Como implementar GitFlow en Gitlab y Github. 2023. Disponível em: <https://www.udemy.com/course/como-implementar-gitflow-en-gitlab-y-github>. Acesso em: 26 mai. 2023.
+
 FULL CYCLE 3.0. Integração contínua. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 26 mai. 2023.
 
 FULL CYCLE 3.0. Padrões e técnicas avançadas com Git e Github. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 26 mai. 2023.
 
-SONARCLOUD. Clean code in your cloud workflow with {SonarCloud}. 2023. Disponível em: <https://www.sonarsource.com/products/sonarcloud/>. Acesso em: 26 mai. 2023.
+SONARCLOUD. Clean code in your cloud workflow with {SonarCloud}. 2023. Disponível em: <https://www.sonarsource.com/products/sonarcloud>. Acesso em: 26 mai. 2023.
 
 FULL CYCLE 3.0. API Gateway com Kong e Kubernetes. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 31 mai. 2023.
 
@@ -1571,8 +1572,8 @@ TERRAFORM. Provision a GKE Cluster (Google Cloud). 2023. Disponível em: <https:
 
 FULL CYCLE 3.0. GitOps. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 02 jun. 2023.
 
-ARGO CD. Getting Started. 2023. Disponível em: <https://argo-cd.readthedocs.io/en/stable/getting_started/>. Acesso em: 02 jun. 2023.
+ARGO CD. Getting Started. 2023. Disponível em: <https://argo-cd.readthedocs.io/en/stable/getting_started>. Acesso em: 02 jun. 2023.
 
 FULL CYCLE 3.0. Terraform. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 04 jun. 2023.
 
-KUBERNETES DOCUMENTATION. Declarative Management of Kubernetes Objects Using Kustomize. 2023. Disponível em: <https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/>. Acesso em: 04 jun. 2023.
+KUBERNETES DOCUMENTATION. Declarative Management of Kubernetes Objects Using Kustomize. 2023. Disponível em: <https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization>. Acesso em: 04 jun. 2023.

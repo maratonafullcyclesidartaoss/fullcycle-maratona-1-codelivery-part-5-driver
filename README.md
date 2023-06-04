@@ -30,7 +30,7 @@ Dinâmica do sistema:
 
 #### Operate What You Build
 
-Nesta quinta versão, trabalhamos a parte de _Continuous Integration_ e _Continuous Deploy_. Iniciamos pela aplicação Driver.
+Nesta quinta versão, trabalhamos com tecnologias relacionadas aos processos de _Continuous Integration_ e _Continuous Deploy_, aplicados à aplicação _Driver_.
 
 - Backend
 
@@ -39,13 +39,16 @@ Nesta quinta versão, trabalhamos a parte de _Continuous Integration_ e _Continu
 - Continuous Integration (_CI_)
 
   - GitHub Actions
+  - [SonarCloud](https://www.sonarsource.com/products/sonarcloud/)
+  - [Spectral](https://meta.stoplight.io/docs/spectral/674b27b261c3c-overview)
 
 - Continuous Deploy (_CD_)
 
-  - Google Cloud Build
+  - [Kustomize](https://kustomize.io/)
 
 - Deploy
 
+  - ArgoCD
   - Kubernetes GKE
 
 - Infrastructure as Code (_IaC_)
@@ -56,76 +59,76 @@ Nesta quinta versão, trabalhamos a parte de _Continuous Integration_ e _Continu
 
 O objetivo deste projeto é cobrir um processo simples de desenvolvimento do início ao fim, desde:
 
-- A utilização de uma metodologia para se trabalhar com o Git - o GitFlow;
-- A adoção de Conventional Commits como especificação para as mensagens de commits;
-- A adoção de Semantical Versioning (SemVer) como convenção para o versionamento de versões do software;
+- A utilização de uma metodologia para se trabalhar com o _Git_ - o _GitFlow_;
+- A adoção de _Conventional Commits_ para as mensagens de _commits_ e de _Semantical Versioning (SemVer)_ para o versionamento de _releases_ da aplicação;
 
 Até a definição de:
 
-- Pipelines de Integração Contínua;
-- Pipelines de Entrega Contínua;
+- Um _pipelines_ de Integração Contínua (_CI_);
+- Um _pipelines_ de Entrega Contínua (_CD_);
 
 Realizando, por fim:
 
-- O deploy da aplicação em um cluster Kubernetes junto a um cloud provider.
+- O _deploy_ da aplicação em um _cluster Kubernetes_ junto a um _cloud provider_.
 
 Assim, seguiremos uma seqüência de passos:
 
-1. Utilização da metodologia de Git Flow;
-2. Definição de um nova Organização no GitHub;
-3. Configuração de branches no GitHub;
+1. Utilização da metodologia de _GitFlow_;
+2. Definição de uma Organização no _GitHub_;
+3. Configuração de _branches_ no _GitHub_;
 
-- Filtros por branches;
-- Proteção do branch master para evitar push direto;
+- Filtros por _branches_;
+- Proteção do _branch master_ para evitar _push_ direto;
 
-4. Configuração de Pull Requests (PRs) no GitHub;
+4. Configuração de _Pull Requests_ (_PRs_) no _GitHub_;
 
-- Templates para PRs;
+- _Templates_ para _PRs_;
 
-5. Configuração de Code Review no GitHub;
-6. Configuração de CODEOWNERS no GitHub;
-7. GitHub Actions;
-8. Integração do SonarCloud Scan (Linter) ao GitHub Actions;
-9. Provisionamento de um cluster GKE utilizando Terraform;
-10. Deploy da aplicação utilizando o Google Cloud Build integrado ao GitHub Actions;
+5. Configuração de _Code Review_ no _GitHub_;
+6. Configuração de _CODEOWNERS_ no _GitHub_;
+7. Criação de _workflows_ com _GitHub Actions_;
+8. Integração do _SonarCloud Scan_ (_Linter_) como _GitHub Action_;
+9. Integração da validação de _API_ como _GitHub Action_, conforme processo de _APIOps_;
+10. Provisionamento de um _cluster GKE_ utilizando _Terraform_;
+11. _Deploy_ da aplicação utilizando o _ArgoCD_ como _GitOps Operator_, conforme processo de _GitOps_.
 
-### Utilização da metodologia de Git Flow
+### Utilização da metodologia de GitFlow
 
-- Qual é o problema que o Git Flow resolve?
+- Qual é o problema que o _GitFlow_ resolve?
 
-Na verdade, o Git Flow é uma metodologia de trabalho que visa simplificar e organizar o processo que envolve o versionamento de código-fonte. Portanto, ele resolve um conjunto de problemas, como, por exemplo:
+Na verdade, o _GitFlow_ é uma metodologia de trabalho que visa simplificar e organizar o processo que envolve o versionamento de código-fonte. Portanto, ele resolve um conjunto de problemas, como, por exemplo:
 
-- Como definir um branch para uma correção?
-- Como definir um branch para uma funcionalidade nova?
+- Como definir um _branch_ para uma correção?
+- Como definir um _branch_ para uma funcionalidade nova?
 - Como saber se uma funcionalidade nova ainda está em desenvolvimento ou foi concluída?
-- Como saber se o que está no branch master é o mesmo que está em Produção?
-- Como saber se existe um branch de desenvolvimento?
+- Como saber se o que está no _branch master_ é o mesmo que está em Produção?
+- Como saber se existe um _branch_ de desenvolvimento?
 
-Vejamos, então, dois cenários deste projeto aonde será empregado o Git Flow.
+Vejamos, então, dois cenários deste projeto aonde será empregado o _GitFlow_.
 
 #### Cenário I
 
 Neste cenário, há a definição de um _branch master_, também conhecido como _o branch da verdade_, porque, normalmente, o que está no _master_ equivale ao que está em Produção.
 
-O Git Flow recomenda que não se commita diretamente no _branch master_. O _master_ não deve ser um local onde se consolidam todas as novas funcionalidades.
+O _GitFlow_ recomenda que não se aplique um _commit_ diretamente no _branch master_. O _master_ não deve ser um local onde se consolidam todas as novas funcionalidades.
 
-Então, o Git Flow define um branch auxiliar para que, quando todas as funcionalidades novas forem agregadas no branch auxiliar, aí sim elas são jogadas para o branch master. Esse branch auxiliar é chamado de _develop_.
+Então, o _GitFlow_ define um _branch_ auxiliar para que, quando todas as funcionalidades novas forem agregadas no branch auxiliar, aí sim elas são jogadas para o branch master. Esse branch auxiliar é chamado de _develop_.
 
-O Git Flow define também um branch chamado de feature para desenvolver cada nova funcionalidade. Quando o desenvolvimento finaliza, é feito um merge no branch develop. Ou seja, ao finalizar, é tudo jogado para o branch develop. Frisando que nunca deve-se mergear diretamente uma funcionalidade nova com o branch master.
+O _GitFlow_ define também um branch chamado de _feature_ para desenvolver cada nova funcionalidade. Quando o desenvolvimento finaliza, é feito um merge no _branch develop_. Ou seja, ao finalizar, é tudo jogado para o branch develop. Frisando que nunca deve-se mergear diretamente uma funcionalidade nova com o _branch master_.
 
-Sumarizando, o Git Flow define um branch para _feature_, _develop_ e _master_.
+Sumarizando, o _GitFlow_ define um _branch_ para _feature_, _develop_ e _master_.
 
 #### Cenário II
 
-Neste cenário, há a definição do branch release. Ou seja, antes de colocar qualquer coisa no branch master, é necessário criar, antes, um branch de release.
+Neste cenário, há a definição do _branch release_. Ou seja, antes de colocar qualquer coisa no _branch master_, é necessário criar, antes, um _branch_ de _release_.
 
-E, a partir desse branch de release, é gerada uma tag e, depois, faz-se o merge no branch master.
+E, a partir desse _branch_ de _release_, é gerada uma _tag_ e, depois, faz-se o _merge_ no _branch master_.
 
-Dessa forma, no dia-a-dia, tudo o que for sendo consolidado é jogado no branch develop. Porém, ao concluir uma _sprint_, por exemplo, pode-se separar as novas funcionalidades e colocá-las em um branch de release.
+Dessa forma, no dia-a-dia, tudo o que for sendo consolidado é jogado no _branch develop_. Porém, ao concluir uma _sprint_, por exemplo, pode-se separar as novas funcionalidades e colocá-las em um _branch de release_.
 
-Uma vez que haja uma release, pode-se solicitar ao pessoal de QA, por exemplo, verificar se não há mais nada para corrigir.
+Uma vez que haja uma _release_, pode-se solicitar ao pessoal de _QA_, por exemplo, verificar se não há mais nada para corrigir.
 
-Estando tudo correto, pode-se fazer o merge. E, a partir do merge, é gerada uma tag, que é enviada para o branch master.
+Estando tudo correto, pode-se fazer o merge. E, a partir do _merge_, é gerada uma _tag_, que é enviada para o _branch master_.
 
 ### Definição de um nova Organização no GitHub
 
@@ -135,7 +138,7 @@ Nesse sentido, criamos uma organização fictícia, a _maratonafullcyclesidartao
 
 ![Nova organização e usuários do GitHub vinculados](./images/nova-organizacao-e-usuarios-vinculados.png)
 
-Logo, para o commit da aplicação driver:
+Logo, para o _commit_ da aplicação _Driver_:
 
 1. Criamos um novo repositório público na organização _maratonafullcyclesidartaoss_: o _fullcycle-maratona-1-codelivery-part-5-driver_.
 
@@ -157,7 +160,7 @@ git push -u origin master
 
 ### Configuração de branches no GitHub
 
-São consideradas boas práticas que dão mais segurança e tranqüilidade aos membros da equipe ao trabalhar com repositórios no GitHub:
+São consideradas boas práticas, que proporcionam mais segurança e tranqüilidade ao trabalhar-se com repositórios no _GitHub_:
 
 - Nunca comitar diretamente no _branch master_;
 - Nunca comitar diretamente no _branch develop_;
@@ -167,7 +170,7 @@ Sendo assim, a seguir, são feitas algumas configurações básicas para a prote
 
 ### Protegendo branches
 
-A princípio, o repositório é criado apenas com o _branch master_. Então, deve-se criar o _branch develop_ também:
+A princípio, por padrão, um repositório é criado apenas com um _branch_: o _branch master_. Então, criaremos o _branch develop_ na seqüência:
 
 ```
 git checkout -b develop
@@ -177,15 +180,13 @@ git push origin develop
 
 ![Criação branch develop](./images/criacao-branch-develop.png)
 
-Dessa forma, o _branch master_ não será mais o _branch_ padrão. Ele será um _branch_ que utilizaremos como base para verificar se o que está nele equivale ao que está em Produção.
-
-E o _branch_ padrão que utizaremos para comitar, conforme o processo de _Git Flow_, será o _develop_.
+Dessa forma, o _branch master_ não será mais o _branch_ padrão. Ele será um _branch_ que utilizaremos como base para verificar se o que está nele equivale ao que está em Produção. E o _branch_ padrão que utizaremos para comitar, conforme o processo de _GitFlow_, será o _develop_.
 
 Neste momento, então, nós vamos nas configurações do _GitHub_, em _Settings_ / _Default branch_ e alteramos de _master_ para _develop_, para garantir que os _commits_ não serão feitos diretamente para o _branch master_.
 
 Outra configuração importante refere-se à parte de proteção. Para isso, ao acessar _Settings / Branches / Branch protection rules_, é possível adicionar regras de proteção para os _branches_.
 
-Primeiramente, faremos a proteção do _branch master_. Neste momento, nós iremos restringir o _push_ para alguns grupos ou pessoas, ao marcar a opção _Restrict who can push to matching branches_. Por ora, é isso. Clicamos em Create.
+Primeiramente, faremos a proteção do _branch master_. Neste momento, nós iremos restringir o _push_ para alguns grupos ou pessoas, ao marcar a opção _Restrict who can push to matching branches_. Por ora, é isso: clicamos em _Create_.
 
 Em seguida, fazemos a proteção do _branch develop_, da mesma forma que fizemos com o _branch master_.
 
@@ -209,7 +210,7 @@ git commit -m "docs: update readme.md"
 git push origin feature/update-readme
 ```
 
-O repositório no GitHub verifica que um novo branch chamado feature/update-readme subiu e já oferece a opção de comparar esse branch com os demais branches do repositório e já realizar uma _Pull Request_.
+O repositório no GitHub verifica que um novo _branch_ chamado feature/update-readme subiu e já oferece a opção de comparar esse _branch_ com os demais _branches_ do repositório e já realizar uma _Pull Request_.
 
 ![Compare & pull request](./images/compare-and-pull-request.png)
 
@@ -239,7 +240,7 @@ No entanto, esse detalhamento pode deixar muito a desejar, porque pode ficar em 
 
 Por conta disso, é possível trabalhar com a utilização de _templates_ para _PRs_. Então, toda vez que for criado um novo _PR_, um _template_ pré-montado é apresentado à pessoa que esteja criando o _PR_ para que ela possa seguir algumas diretrizes.
 
-Nesse sentido, vamos utilizar um _template_ baseado em um modelo disponível no _site_ _Embedded Artistry_: `https://embeddedartistry.com/blog/2017/08/04/a-github-pull-request-template-for-your-projects`.
+Nesse sentido, vamos utilizar um _template_ baseado em um modelo disponível no _site_ _[Embedded Artistry](https://embeddedartistry.com/blog/2017/08/04/a-github-pull-request-template-for-your-projects)_.
 
 A partir desse modelo, nós vamos criar um arquivo chamado _PULL_REQUEST_TEMPLATE.md_ dentro do diretório _.github_.
 
@@ -366,7 +367,7 @@ Assim, quando é feito, pelo menos, uma revisão por um usuário revisor, é lib
 
 ### Trabalhando com CODEOWNERS
 
-Imaginemos o seguinte exemplo:
+Imaginemos o seguinte cenário:
 
 - O usuário _desafiofullcyclesidartaoss_ é um especialista _frontend_ e o usuário _sidartaoss_ é um especialista _backend_. Em determinado momento, por algum motivo, o usuário _desafiofullcyclesidartaoss_ precisou alterar o código que foi criado pelo usuário _sidartaoss_. Não seria apropriado o usuário _sidartaoss_ revisar o _PR_ desse código, já que ele é especialista nesse tipo de código e foi ele quem o criou?
 
@@ -875,9 +876,12 @@ Dessa forma, é repassada ao time de _APIs_ a responsabilidade de fornecer as fe
 
 A _APIOps_ visa, por fim, aumentar a qualidade da _API_, para que seja produzida de uma maneira uniforme, aplicando um padrão de contrato, de forma que os clientes não tenham uma experiência ruim ao integrar com a _API_ que está sendo disponibilizada.
 
-### Ferramentas Necessárias
+#### Ferramentas Necessárias
 
-Vejamos algumas ferramentas para implementar os fluxos de _APIOps_.
+Vejamos o papel de algumas ferramentas na implementação dos fluxos de _APIOps_:
+
+- GitHub Actions;
+- Spectral.
 
 #### GitHub Actions
 
@@ -903,7 +907,7 @@ jobs:
 
 #### Spectral
 
-O _Spectral_ é uma ferramenta da empresa _Spotlight (https://stoplight.io/open-source/spectral)_.
+O _Spectral_ é uma ferramenta da empresa _[Spotlight](https://stoplight.io/open-source/spectral)_.
 
 O objetivo dessa ferramenta é validar determinados arquivos como, por exemplo, o arquivo _OpenAPI_ que descreve o nosso contrato (_swagger.yaml_). Assim, o _Spectral_ é capaz de aplicar _linters_, ou seja, ele identifica algumas características que ele valida baseado em níveis de severidade.
 
@@ -929,11 +933,17 @@ Por fim, não devemos esquecer de ajustar as configurações em _Settings / Bran
 
 ### Terraform
 
-Antes de iniciarmos o processo de _Continuous Delivery_, precisamos criar um _cluster_ _Kubernetes_. Neste projeto, iremos trabalhar com o _Google Kubernetes Engine_ (_GKE)_.
+Antes de iniciarmos o processo de _Continuous Delivery_, precisamos criar um _cluster_ _Kubernetes_. Lembrando que, neste projeto, iremos trabalhar com o _Google Kubernetes Engine_ (_GKE)_.
 
-Mas, desta vez, não iremos criar a partir do painel do _Google Cloud Platform (GCP)_; iremos provisionar via _Infrastructure As Code_ (_IaC_), utilizando o _Terraform_.
+Mas, desta vez, não iremos criar o _cluster_ partir do painel do _GCP_ (_Google Cloud Platform_); iremos provisionar via _Infrastructure As Code_ (_IaC_), utilizando o _Terraform_.
 
-<Texto Introdução Terraform>
+Aqui, cabe uma breve introdução sobre o _Terraform_.
+
+O _Terraform_ é uma ferramenta _open source_ e foi criado pela _[HashiCorp](https://www.hashicorp.com/)_, empresa focada em desenvolver ferramentas de infraestrutura em nuvem.
+
+O que o _Terraform_ faz de melhor é provisionar infraestrutura. Ou seja, fazer com que _todos_ os componentes de infraestrutura sejam criados em um _cloud provider_. Componentes, neste caso, se referem, principalmente, a objetos de mais baixo nível. Por exemplo, para criar uma máquina em um _cloud provider_, é necessário, antes, criar uma _VPC_, um _Security Group_, _Subnets_, _Internet Gateway_, etc., ou seja, há diversos componentes envolvidos no processo de criação para que se possa atender às configurações que atendam às normas e regras estabelecidas, inclusive de segurança.
+
+Além disso, ele não é uma ferramenta que foi criada para apenas um _cloud provider_; o _Terraform_ trabalha com diversos _providers_. E o que são _providers_? _Providers_ significa uma camada de abstração que torna possível conectar-se com diversos tipos de _cloud_ ou serviços, como, inclusive, o _Kubernetes_.
 
 Seguindo o tutorial do _Terraform_ para provisionar um _cluster GKE_:
 
@@ -1001,14 +1011,54 @@ NAME                                                  STATUS   ROLES    AGE     
 gke-maratona-fullcyc-maratona-fullcyc-12d4c0b5-2j7d   Ready    <none>   4m49s   v1.25.8-gke.500
 gke-maratona-fullcyc-maratona-fullcyc-7a340d65-wkbg   Ready    <none>   4m51s   v1.25.8-gke.500
 gke-maratona-fullcyc-maratona-fullcyc-f97e39ff-dvzw   Ready    <none>   4m51s   v1.25.8-gke.500
-
 ```
 
 ### GitOps
 
 E, agora que provisonamos um _cluster_ _Kubernetes_, podemos iniciar o processo de _Continuous Delivery_, seguindo o modelo de _GitOps_.
 
-<Introdução GitOps>
+O que vem a ser o _GitOps_?
+
+Segundo o _site_ da _[Atlassian](https://www.atlassian.com/br/git/tutorials/gitops)_:
+
+> Em sua essência, o _GitOps_ é uma infraestrutura e um conjunto de procedimentos operacionais com base em código que dependem do _Git_ como um sistema de controle de origem. É uma evolução da Infraestrutura como Código (_IaC_) e uma prática recomendada de _DevOps_ que aproveita o _Git_ como a única fonte de informações e o mecanismo de controle para criar, atualizar e excluir a arquitetura do sistema. Simplificando: é a prática de usar _pull requests_ do _Git_ para verificar e implementar automaticamente modificações na infraestrutura do sistema.
+
+Mas, qual é o problema que o _GitOps_ resolve?
+
+O _GitOps_ trata, principalmente, dessa questão:
+
+- Como garantir que o que está rodando no _cluster Kubernetes_ é o mesmo que está no repositório _Git_? Ou: como garantir que o que está no _branch master_ é exatamente o que está rodando em Produção?
+
+Normalmente, não há como garantir: infere-se que seja a mesma coisa. Mas, se algo acontecer de diferente, como um problema no fluxo de _CI_ ou de _CD_, não há como ter a certeza de que o que está no _branch master_ é, realmente, o que está rodando em Produção.
+
+Isso pode gerar alguns problemas, como:
+
+- Não ter a garantia de que o que foi aplicado em Produção vai conter as últimas funcionalidades que subiram no repositório _Git_.
+- Gerar uma dependência forte da ferramenta de _CI_.
+
+Nesse caso, o _Git_ desempenha um papel menos relevante no processo; ele não é o protagonista, é apenas um lugar aonde se guarda o código. E, por conseguinte, o que estiver rodando no _cluster Kubernetes_ não necessariamente vai ter correlação com o que estiver no repositório _Git_.
+
+Então, como tornar esse processo mais integrado, de forma que possamos ter essa garantia de que o que estiver rodando no _cluster_ seja, realmente, a última versão do que foi armazenado no repositório _Git_?
+
+É nesse sentido que o _GitOps_ vem para nos auxiliar, permitindo que o processo de _deploy_ não fique isolado dos demais processos de _commit_, _CI_ e _CD_; ou seja, permite que o _deploy no Kubernetes_ esteja integrado com os demais processos, fazendo parte, então, de um processo único.
+
+#### Como o GitOps funciona
+
+O _GitOps_ parte do princípio, mas também permite tirar proveito, da pré-condição de que estamos trabalhando com sistemas declarativos, ou seja, o provisionamento da infraestrutura é feito, principalmente, a partir de ferramentas de Infraestrutura como Código (_IaC_), como o _Terraform_, assim como a partir de manifestos declarativos para se trabalhar com o _Kubernetes_, por exemplo.
+
+No _GitOps_, o repositório _Git_ é o protagonista do processo, porque ele torna-se a fonte única da verdade.
+
+Logo, como fazer essa integração de o que está no repositório _Git_ com o que está no _cluster Kubernetes_?
+
+A partir de um Agente, também conhecido como _GitOps Operator_.
+
+Então, assim como no processo tradicional, a aplicação fará um _push_ para o repositório _Git_ e será disparado o processo de _CI_ e _CD_. Só que, no processo de _CD_, não será feita a aplicação do manifesto diretamente no _cluster Kubernetes_, será feito apenas um _commit_, a partir do qual será gerada a nova versão da aplicação de forma declarativa.
+
+Assim, o processo de _CD_ não irá mais conversar conversar com o _cluster_, como no processo tradicional. Quando o processo de _CD_ der um _commit_, esse _commit_ será feito no repositório _Git_, aonde será declarado em um manifesto a nova versão de Produção.
+
+Por conseqüência, o Agente, de tempos em tempos, vai ficar monitorando o repositório _Git_ para saber qual é a nova versão de Produção. Então, assim que o Agente souber da nova versão do repositório _Git_, ele irá aplicar no _cluster Kubernetes_ essa mudança.
+
+Por conta disso, a partir desse momento, o repositório _Git_ torna-se a fonte única da verdade, de forma que o que está rodando no _cluster Kubernetes_ é o mesmo que está no repositório _Git_.
 
 #### Criando imagem Docker
 
@@ -1193,7 +1243,7 @@ spec:
             - containerPort: 8081
 ```
 
-E por que definir o nome da imagem como _driver_ se não é esse o nome da imagem que será baixada do _DockerHub_? Porque o nome da imagem será alterado toda vez que rodar o processo de _CI_, utilizando-se uma ferramenta do próprio _Kubernetes_ conhecida como _Kustomize_.
+E por que definir o nome da imagem como _driver_ se não é esse o nome da imagem que será baixada do _DockerHub_? Porque o nome da imagem será alterado toda vez que rodar o processo de _CD_, utilizando-se uma ferramenta do próprio _Kubernetes_ conhecida como _Kustomize_.
 
 #### Kustomize
 
@@ -1203,7 +1253,7 @@ Então, como atualizar a versão da imagem no manifesto?
 
 Para isso, existem algumas possibilidades, como trabalhar com _Helm_, alterando o pacote do _Helm_, ou trabalhar com uma ferramenta do _Kubernetes_ chamada de _Kustomize_ (https://kustomize.io/).
 
-A idéia do _Kustomize_ é criar um arquivo junto aos manifestos, por exemplo, _kustomization.yaml_, aonde se definem os _resources_, ou seja, os manifestos que a ferramenta vai ler e, em seguida, o nome da imagem que se quer customizar, junto com o novo nome e a nova tag para os quais se quer mudar.
+A idéia do _Kustomize_ é criar um arquivo junto aos manifestos, por exemplo, _kustomization.yaml_, aonde se definem os _resources_, ou seja, os manifestos que a ferramenta vai ler e, em seguida, o nome da imagem que se quer customizar, junto com o novo nome e a nova _tag_ para os quais se quer mudar.
 
 ```
 apiVersion: kustomize.config.k8s.io/v1beta1
@@ -1440,7 +1490,7 @@ Agora, vamos entrar na aplicação:
 
 O _ArgoCD_ está nos informando que tanto o objeto de _Deployment_ quanto _Service_ estão faltando (_missing_) no _cluster Kubernetes_.
 
-Então, para sincronizar, nós podemos clicar em _SYNC/SYNCHRONIZE_ e, automaticamente, é baixada a imagem com base nos manifestos do repositório no _GitHub_ e os objetos são criados no _cluster Kubernetes_: _Deployment_, _ReplicaSet_, _Service_, _POD_:
+Então, para sincronizar, nós podemos clicar em _SYNC/SYNCHRONIZE_ e, automaticamente, é feita a sincronização com o cluster Kubernetes: baixa-se a imagem com base nos manifestos no repositório do _GitHub_ e os são criados os objetos de _Deployment_, _ReplicaSet_, _Service_ e _POD_:
 
 ![ArgoCD sincronizado e objetos criados no cluster](./images/argocd-sincronizado-objetos-criados.png)
 
@@ -1465,11 +1515,54 @@ git checkout -b release/v1.1.1
 git push origin release/v1.1.1
 ```
 
+Ao criar um novo _PR_, podemos ver que rodou o processo de _CD_ e foi alterado o arquivo do _Kustomize_ com a linha da nova versão:
+
+![Arquivo kustomization.yaml alterado novamente com newTag](./images/newtag-kustomization-alterada-novamente.png)
+
+Podemos verificar, também, que foi criada uma imagem com a nova _tag_ no _DockerHub_:
+
+![Gerada nova tag no DockerHub](./images/gerada-nova-tag-dockerhub.png)
+
+Em suma, o fluxo de _CD_ é responsável por apenas subir uma imagem para o _DockerHub_ e alterar uma linha no arquivo do _Kustomize_; não existe nenhuma relação direta com o _cluster Kubernetes_ no processo de _CD_.
+
+E, neste momento, vamos verificar o _ArgoCD_:
+
+![Verificando ArgoCD novamente](./images/verificando-argocd-novamente.png)
+
+De tempos em tempos, o _ArgoCD_ acessa o repositório no _GitHub_ para verificar se houve alguma alteração e podemos ver que a aplicação está _OutOfSync_. O que nós podemos fazer é clicar em _SYNC_ e _SYNCHRONIZE_ e, em seguida, o _ArgoCD_ sincroniza com o _cluster Kubernets_ e um novo _POD_ é criado.
+
+![ArgoCD sincroniza e novo POD é criado](./images/argocd-sincroniza-novo-pod-criado.png)
+
+E, se testarmos novamente, o serviço continua respondendo:
+
+```
+curl 34.173.227.93/drivers
+{"Drivers":[{"uuid":"45688cd6-7a27-4a7b-89c5-a9b604eefe2f","name":"Wesley W"},{"uuid":"9a118e4d-821a-44c7-accc-fa99ac4be01a","name":"Luiz"}]}
+```
+
+### Destruindo a infraestrutura
+
+Chegou o momento de liberar os recursos no ambiente _cloud_.
+
+Para tanto, iremos utilizar o _Terraform_, que irá remover todos os recursos relacionados com o _cluster GKE_.
+
+```
+cd terraform/
+
+terraform destroy
+```
+
+![Cluster GKE destruído](./images/cluster-gke-destruido.png)
+
 #### Referências
+
+UDEMY. Como implementar GitFlow en Gitlab y Github. 2023. Disponível em: <https://www.udemy.com/course/como-implementar-gitflow-en-gitlab-y-github>. Acesso em: 26 mai. 2023.
 
 FULL CYCLE 3.0. Integração contínua. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 26 mai. 2023.
 
 FULL CYCLE 3.0. Padrões e técnicas avançadas com Git e Github. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 26 mai. 2023.
+
+SONARCLOUD. Clean code in your cloud workflow with {SonarCloud}. 2023. Disponível em: <https://www.sonarsource.com/products/sonarcloud>. Acesso em: 26 mai. 2023.
 
 FULL CYCLE 3.0. API Gateway com Kong e Kubernetes. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 31 mai. 2023.
 
@@ -1479,4 +1572,8 @@ TERRAFORM. Provision a GKE Cluster (Google Cloud). 2023. Disponível em: <https:
 
 FULL CYCLE 3.0. GitOps. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 02 jun. 2023.
 
-ARGO CD. Getting Started. 2023. Disponível em: <https://argo-cd.readthedocs.io/en/stable/getting_started/>. Acesso em: 02 jun. 2023.
+ARGO CD. Getting Started. 2023. Disponível em: <https://argo-cd.readthedocs.io/en/stable/getting_started>. Acesso em: 02 jun. 2023.
+
+FULL CYCLE 3.0. Terraform. 2023. Disponível em: <https://plataforma.fullcycle.com.br>. Acesso em: 04 jun. 2023.
+
+KUBERNETES DOCUMENTATION. Declarative Management of Kubernetes Objects Using Kustomize. 2023. Disponível em: <https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization>. Acesso em: 04 jun. 2023.

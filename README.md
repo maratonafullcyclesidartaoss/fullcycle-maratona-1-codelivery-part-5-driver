@@ -92,6 +92,8 @@ Assim, seguiremos uma seqüência de passos:
 10. Provisionamento de um _cluster GKE_ utilizando _Terraform_;
 11. _Deploy_ da aplicação utilizando o _ArgoCD_ como _GitOps Operator_, conforme processo de _GitOps_.
 
+![Seqüência de passos](./images/sequencia-de-passos.png)
+
 ### Utilização da metodologia de GitFlow
 
 - Qual é o problema que o _GitFlow_ resolve?

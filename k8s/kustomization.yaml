@@ -7,4 +7,4 @@ resources:
 images:
 - name: driver
   newName: sidartasilva/fullcycle-maratona-1-codelivery-part-5-driver
-  newTag: bd90c2c39b564e140f1aa674ec330eee527a734e
+  newTag: 76d84b099b1d9578ae6ef6936de1d14f12458baf

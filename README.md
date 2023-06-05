@@ -64,8 +64,8 @@ O objetivo deste projeto é cobrir um processo simples de desenvolvimento do in�
 
 Até a definição de:
 
-- Um _pipelines_ de Integração Contínua (_CI_);
-- Um _pipelines_ de Entrega Contínua (_CD_);
+- Um _pipeline_ de Integração Contínua (_CI_);
+- Um _pipeline_ de Entrega Contínua (_CD_);
 
 Realizando, por fim:
 

@@ -86,11 +86,11 @@ Assim, seguiremos uma seqüência de passos:
 
 5. Configuração de _Code Review_ no _GitHub_;
 6. Configuração de _CODEOWNERS_ no _GitHub_;
-7. Criação de _workflows_ com _GitHub Actions_;
+7. Criação de _workflows_ com _GitHub Actions_ (_CI/CD_);
 8. Integração do _SonarCloud Scan_ (_Linter_) como _GitHub Action_;
 9. Integração da validação de _API_ como _GitHub Action_, conforme processo de _APIOps_;
-10. Provisionamento de um _cluster GKE_ utilizando _Terraform_;
-11. _Deploy_ da aplicação utilizando o _ArgoCD_ como _GitOps Operator_, conforme processo de _GitOps_.
+10. Provisionamento de um _cluster GKE_ utilizando _Terraform_ (_IaC_);
+11. _Deploy_ da aplicação utilizando o _ArgoCD_, conforme processo de _GitOps_, no _Kubernetes GKE_.
 
 ![Seqüência de passos](./images/sequencia-de-passos.png)
 
